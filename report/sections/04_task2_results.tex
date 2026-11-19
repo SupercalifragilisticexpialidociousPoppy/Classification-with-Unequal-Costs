@@ -1,4 +1,144 @@
-% TODO (Member 2): replace this placeholder.
-\section{Accuracy-based versus loss-minimising decisions}
-\label{sec:task2}
-\emph{To be written by Member 2.}
+% report/sections/04_task2_results.tex -- Task 2 results (C3, Member 2)
+% Every figure and table comes from `python -m project4.experiments.task2_cost_sweep`
+% (files in project4/figures and project4/results). Do not type numbers by hand.
+% Discussion sentences that depend on the measured numbers are marked \todo{...}:
+% check each against the real run, then rewrite or delete the marker.
+\providecommand{\todo}[1]{\textbf{[TODO: #1]}}
+\providecommand{\cFP}{c_{\mathrm{FP}}}
+\providecommand{\cFN}{c_{\mathrm{FN}}}
+\providecommand{\cI}{c_{\mathrm{I}}}
+
+\section{Task 2 results: accuracy-based versus loss-minimising decisions}
+\label{sec:task2-results}
+
+\subsection{Experimental setup}
+\paragraph{Data and splits.}
+We use UCI Spambase (4601 emails, 57 features, 1813 spam) and a synthetic two-class Gaussian data set with
+$d=5$, $n=4601$, $\pi_1=0.39$, $\mu_0=0$, $\mu_1=0.9\cdot\mathbf 1$, $\Sigma_0=I$ and
+$\Sigma_1=\tfrac12 I+\tfrac12\mathbf 1\mathbf 1^{\top}$. The covariances differ, so the true posterior is quadratic
+and the exact Bayes risk can be computed. Each data set is split 60/20/20 into training, validation and test parts,
+stratified by class. All results are means with standard errors over 20 repeated splits (seeds $0$--$19$).
+Features are standardised with training statistics only. The test part is never used to choose anything.
+
+\paragraph{Models.}
+We fit logistic regression (Newton/IRLS with an L2 penalty on the weights, Section~\ref{sec:models}) and the
+Gaussian generative classifier with shared covariance and with class-specific covariances
+(Section~\ref{sec:t2}). The L2 strength $\lambda_2\in\{10^{-2},10^{-1.5},\dots,10^{3}\}$ and the Gaussian
+shrinkage strength $\lambda\in\{10^{-3},10^{-2},0.03,0.1,0.3,1\}$ of Section~\ref{sec:t2-reg} are chosen on the validation
+part by minimum log-loss. On the synthetic data we also report an \emph{oracle} that applies the same decision
+rules to the exact posterior.
+
+\paragraph{Costs.}
+The loss matrix is that of Task~1: correct decisions cost $0$, a real email sent to spam costs $\cFP$, spam
+delivered costs $\cFN$ and an inspection costs $\cI$, with the inspector always finding the true label. We sweep
+the cost ratio $r=\cFP/\cFN$ on a log grid from $1/20$ to $20$ with
+$\cFP=\sqrt r$ and $\cFN=1/\sqrt r$, and keep $\cI=0.1$ fixed. For this scheme the critical inspection cost
+$\cFP\cFN/(\cFP+\cFN)=\sqrt r/(1+r)$ is at least $0.21$ on the whole grid, so $\cI<\cFP\cFN/(\cFP+\cFN)$ holds at
+every ratio and the inspect band is never empty.
+
+\paragraph{Decision rules.}
+For each fitted posterior $p=P(y=1\mid x)$ we compare three rules.
+\begin{description}[leftmargin=1.5em,labelsep=0.5em,itemsep=2pt]
+  \item[Accuracy rule] send to spam iff $p\ge\tfrac12$, no inspection. This is the Bayes rule for 0--1 loss.
+  \item[Bayes, two actions] send to spam iff $p\ge\cFP/(\cFP+\cFN)$, no inspection.
+  \item[Bayes with inspection] deliver if $p\le\theta_0=\cI/\cFN$, send to spam if $p\ge\theta_1=1-\cI/\cFP$,
+        inspect otherwise.
+\end{description}
+The reported quantity is the average realized loss per test email, $\frac1N\sum_n L[a_n,y_n]$, so an inspection
+contributes $\cI$ whatever the true label.
+
+\subsection{Average realized loss against the cost ratio}
+Figure~\ref{fig:t2-loss} shows the loss of the three rules as the ratio varies, and
+Tables~\ref{tab:t2-loss-spambase} and~\ref{tab:t2-loss-synthetic} give the values at three representative
+ratios, $r\in\{0.1,1,10\}$.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{task2_loss_spambase}\\[4pt]
+  \includegraphics[width=\textwidth]{task2_loss_synthetic}
+  \caption{Average realized test loss against $\cFP/\cFN$ (log scale), mean $\pm$ standard error over 20 splits,
+  $\cI=0.1$. Top: Spambase. Bottom: synthetic data, where the dashed line is the oracle with inspection.
+  Dotted vertical lines mark the ratios of the tables.}
+  \label{fig:t2-loss}
+\end{figure}
+
+\begin{table}[ht]
+  \centering\small
+  \input{\resultsdir/task2_loss_spambase.tex}
+  \caption{Spambase: average realized test loss, mean $\pm$ standard error over 20 splits.}
+  \label{tab:t2-loss-spambase}
+\end{table}
+
+\begin{table}[ht]
+  \centering\small
+  \input{\resultsdir/task2_loss_synthetic.tex}
+  \caption{Synthetic data: average realized test loss, mean $\pm$ standard error over 20 splits.}
+  \label{tab:t2-loss-synthetic}
+\end{table}
+
+\subsection{Confusion matrices}
+Tables~\ref{tab:t2-conf-spambase} and~\ref{tab:t2-conf-synthetic} give the mean confusion matrices of logistic
+regression, with the inspect column, at the three representative ratios (counts per test split,
+about 920 emails). Figure~\ref{fig:t2-reject} shows how the share of inspected emails changes with the ratio.
+The matrices for the Gaussian models are produced by the same script and are listed in the appendix.
+
+\begin{table}[ht]
+  \centering\small
+  \input{\resultsdir/task2_confusion_spambase_logistic.tex}
+  \caption{Spambase, logistic regression: mean confusion matrices (true label $\times$ action).}
+  \label{tab:t2-conf-spambase}
+\end{table}
+
+\begin{table}[ht]
+  \centering\small
+  \input{\resultsdir/task2_confusion_synthetic_logistic.tex}
+  \caption{Synthetic data, logistic regression: mean confusion matrices (true label $\times$ action).}
+  \label{tab:t2-conf-synthetic}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{task2_reject_spambase}\\[4pt]
+  \includegraphics[width=\textwidth]{task2_reject_synthetic}
+  \caption{Share of emails held for inspection under the Bayes rule with inspection, against $\cFP/\cFN$.
+  Top: Spambase. Bottom: synthetic data.}
+  \label{fig:t2-reject}
+\end{figure}
+
+\subsection{Discussion}
+\paragraph{The accuracy rule is optimal only at equal costs.}
+The accuracy rule uses threshold $\tfrac12$, which equals the Bayes two-action threshold
+$\cFP/(\cFP+\cFN)$ only when $\cFP=\cFN$. At $r=1$ the two rules therefore make identical decisions and
+have identical loss, as the figures and tables show. Away from $r=1$ the accuracy rule is
+suboptimal in expectation whenever the posterior is calibrated, and its loss rises as $|\log r|$ grows,
+because it keeps treating both kinds of error alike while one of them becomes much more expensive.
+\todo{state the measured loss gap between the accuracy rule and the Bayes two-action rule at $r=0.1$ and $r=10$
+for the three models, on both data sets.}
+
+\paragraph{Allowing inspection lowers the loss.}
+Since $\cI$ is below the critical value at every ratio, the Bayes rule with inspection has a nonempty band and
+a lower expected loss than any two-action rule, provided the posterior is calibrated. In the tables it should
+therefore have the lowest loss in every column.
+\todo{confirm this for every model and ratio, and report the reject rate at $r=0.1,1,10$ from
+Figure~\ref{fig:t2-reject}. Say which kind of email is inspected: the confusion tables show how the inspect
+column splits between real and spam emails.}
+
+\paragraph{Comparison of the models.}
+On the synthetic data the true covariances differ, so the class-specific Gaussian model is correctly specified
+and should come closest to the oracle, while the shared-covariance Gaussian and logistic regression are
+linear and cannot represent the quadratic boundary.
+\todo{report the gap of each model to the oracle at the three ratios. On Spambase say which model has the lowest
+loss and whether the class-specific Gaussian suffers from its $3306$ covariance parameters, using the chosen
+shrinkage strengths in \texttt{results/task2\_hyperparams.csv}.}
+
+\paragraph{Calibration matters.}
+The thresholds $\theta_0,\theta_1$ are the Bayes thresholds only if the model's probabilities are calibrated
+(Section~\ref{sec:t2}). A model with the same accuracy but saturated probabilities, as the Gaussian models can
+produce on Spambase, can be well off at the optimal thresholds, which is the point of the calibration analysis
+that follows. \todo{compare the logistic and Gaussian reject rates and losses and relate them to the
+reliability plots of the calibration section, if the numbers support it.}
+
+\paragraph{Limitations.}
+The inspector is assumed perfect and $\cI$ is held fixed; the sensitivity to $\cI$ is the subject of
+Task~5. Each test part has about 920 emails, so differences smaller than the standard errors in the tables
+should not be interpreted.
