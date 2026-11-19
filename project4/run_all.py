@@ -11,6 +11,7 @@ import traceback
 
 EXPERIMENTS = (
     ("t6_analytic", "M6  T6 analytic curves and rule table"),
+    ("c2_gaussian", "M3  C2 Gaussian classifiers on Spambase, raw vs log(1+x)"),
     ("task2_cost_sweep", "M2  C3 logistic regression and cost-ratio sweep"),
     ("task3_calibration", "M5  C4 log-loss, Brier, reliability"),
     ("task4_prior_shift", "M1  C5 prior-shift experiments"),
