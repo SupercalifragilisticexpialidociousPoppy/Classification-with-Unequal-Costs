@@ -59,14 +59,14 @@ feature $\phi_0=1$. Adding $\lshift$ to $a(x)$ is the same as replacing $w_0$ by
 all the other weights. The corrected model is still a logistic regression, and in feature space its decision
 boundaries move parallel to themselves.
 
-Which $\pio$ did the model learn? In the lectures (Section~\ref{sec:models}) the gradient of the
-cross-entropy error is $\nabla E = \sum_n(\post_n-y_n)\,\phi(x_n)$, where $\post_n$ is the model's
+Which $\pio$ did the model learn? The gradient of the cross-entropy error is
+$\nabla E = \sum_n(\post_n-y_n)\,\phi_n$ (equation~\eqref{eq:t3-grad}), where $\post_n$ is the model's
 probability and $y_n$ the label. Its component for the constant feature is $\sum_n(\post_n-y_n)$, which is zero
 at the optimum. So $\frac1N\sum_n\post_n = N_1/N$: the average predicted probability on the training data
 equals the training spam share. We therefore use $\pio = N_1/N$. With an L2 penalty on $w_0$ this holds only approximately.
 
 \paragraph{Gaussian model: swap the priors.}
-For Gaussian classes with a shared covariance (lectures, Section~\ref{sec:models})
+For Gaussian classes with a shared covariance (Section~\ref{sec:t2})
 \[
   a(x) = w^\top x + w_0, \qquad
   w_0 = -\tfrac12\mu_1^\top\Sigma^{-1}\mu_1 + \tfrac12\mu_0^\top\Sigma^{-1}\mu_0 + \log\frac{\pio}{\piz}.

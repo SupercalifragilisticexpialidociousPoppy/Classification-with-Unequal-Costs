@@ -36,8 +36,10 @@ L = LossMatrix(C_FP, C_FN, C_INSP)
 N_BINS = 10
 LOG1P = True                         # log(1+x) before standardising Spambase (skewed counts)
 GAUSS_SHARED_COV = True              # Gaussian model with one shared covariance
-GAUSS_REG_GRID = (1e-3, 1e-2, 1e-1, 0.3)       # covariance shrinkage, chosen on validation
-LOGISTIC_L2_GRID = (1e-3, 1e-2, 1e-1, 1.0, 10.0)  # L2 strength, chosen on validation
+# Chosen on validation by log-loss.  Checked with the team models: extending either grid
+# (reg down to 1e-5, l2 up to 300) changes no reported number at three decimals.
+GAUSS_REG_GRID = (1e-3, 1e-2, 1e-1, 0.3)              # covariance shrinkage, models/gaussian.py
+LOGISTIC_L2_GRID = (1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0)  # L2 strength, models/logistic.py
 SYN = dict(n=4601, pi1=0.4, mu0=[0.0, 0.0], mu1=[1.5, 1.0], S=[[1.0, 0.3], [0.3, 1.0]], seed=2024)
 T_GRID = np.exp(np.linspace(np.log(0.25), np.log(4.0), 33))   # temperatures for the sweep
 T_TABLE = (0.4, 1.0, 2.5)            # rows of the temperature table
@@ -286,7 +288,7 @@ def fig_reliability(pooled, preview):
         axh.grid(axis="x", visible=False)
         if c == 0:
             axh.set_ylabel("Count", fontsize=8)
-        axh.set_xlabel("Predicted probability $p$")
+        axh.set_xlabel("Predicted probability $q$")
     fig.axes[0].legend(loc="upper left", fontsize=8)
     _preview_note(fig, preview)
     save(fig, FIGURES_DIR / "c4_reliability")
@@ -294,7 +296,7 @@ def fig_reliability(pooled, preview):
 
 def fig_temperature(temp, preview):
     Ts = np.array(sorted(T_GRID))
-    panels = (("accuracy", "Accuracy (labels from $p \\geq 0.5$)"), ("log_loss", "Log-loss"),
+    panels = (("accuracy", "Accuracy (labels from $q \\geq 0.5$)"), ("log_loss", "Log-loss"),
               ("cost", "Realized loss per email (Bayes rule)"), ("reject_rate", "Fraction inspected"))
     fig, axes = plt.subplots(2, 2, figsize=(7.0, 4.4), sharex=True)
     for ax, (m, title) in zip(axes.ravel(), panels):
@@ -313,7 +315,7 @@ def fig_temperature(temp, preview):
     fig.supxlabel("Temperature $T$ (log scale).  $T<1$: over-confident,  $T=1$: model as fitted,  "
                   "$T>1$: under-confident", fontsize=9)
     d, m = TEMPERATURE_MODEL
-    fig.suptitle(f"{m} model on {d.capitalize()}, $p_T=\\sigma(\\mathrm{{logit}}(p)/T)$, "
+    fig.suptitle(f"{m} model on {d.capitalize()}, $q_T=\\sigma(\\mathrm{{logit}}(q)/T)$, "
                  f"$c_{{FP}}={C_FP:g}$, $c_{{FN}}={C_FN:g}$, $c_I={C_INSP:g}$",
                  x=0.02, ha="left", fontsize=9, color=INK_MUTED)
     fig.tight_layout()
