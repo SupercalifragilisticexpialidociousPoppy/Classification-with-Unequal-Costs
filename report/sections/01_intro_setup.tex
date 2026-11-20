@@ -38,7 +38,7 @@ Section~\ref{sec:decision} fixes the loss matrix, derives the action that minimi
 expected loss, and gives explicit thresholds with and without an inspect option.
 Section~\ref{sec:models} presents the two classifiers we compare: a Gaussian generative classifier
 (with shared or class-specific covariance) and logistic regression, both written from scratch.
-Section~\ref{sec:task2} compares accuracy-based and loss-minimising decisions over a range of cost
+Section~\ref{sec:task2-results} compares accuracy-based and loss-minimising decisions over a range of cost
 ratios, with confusion matrices and average realised loss.
 Section~\ref{sec:calibration} measures probability quality with log-loss, the Brier score and
 reliability plots, and explains why correct labels alone do not guarantee good decisions.
@@ -47,7 +47,14 @@ fixed, derives the posterior-odds correction for known priors, and tests it.
 Section~\ref{sec:accuracy-cost} shows a setting where higher accuracy comes with higher cost, traces
 realised cost and rejection rate as the inspection cost varies, and determines when allowing rejection
 improves the system. Section~\ref{sec:conclusion} summarises the findings.
-% TODO (Member 1): once Sections 4-7 have results, add one sentence with the headline numbers.
+
+\paragraph{Main findings.}
+Moving the spam threshold from $1/2$ to the cost-optimal $10/11$ lowers accuracy from $84.6\%$ to $73.9\%$
+on our synthetic data yet more than halves the cost (Section~\ref{sec:c6}); on Spambase, letting the
+logistic filter inspect $24\%$ of emails at $\ci=0.3$ saves $0.10$ per email; and when spam falls to
+$5\%$ of the traffic, correcting the posterior for the new prior cuts the cost from $0.095$ to $0.038$
+per email (Section~\ref{sec:c5}).
+% Numbers from results/c6_*.csv and results/c5_summary.csv; update them if the experiments change.
 
 \subsection{Experimental setup}
 % Member 6 (C1)
