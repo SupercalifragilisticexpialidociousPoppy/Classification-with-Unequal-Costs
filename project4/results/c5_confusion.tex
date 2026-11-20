@@ -1,0 +1,25 @@
+\begin{tabular}{llll rrr}
+\toprule
+Data & Model & Correction & True label & Deliver & Spam folder & Inspect \\
+\midrule
+Synthetic & Gaussian (shared cov.) & none & real & 2780.2 & 0.1 & 1971.5 \\
+ & & & spam & 37.2 & 24.9 & 186.2 \\[2pt]
+Synthetic & Gaussian (shared cov.) & known & real & 4744.6 & 0.0 & 7.1 \\
+ & & & spam & 177.2 & 0.5 & 70.7 \\[2pt]
+\midrule
+Synthetic & Logistic regression & none & real & 2490.2 & 0.0 & 2261.4 \\
+ & & & spam & 33.1 & 23.2 & 192.1 \\[2pt]
+Synthetic & Logistic regression & known & real & 4744.2 & 0.0 & 7.5 \\
+ & & & spam & 177.0 & 0.4 & 71.0 \\[2pt]
+\midrule
+Spambase & Gaussian (shared cov.) & none & real & 525.6 & 4.8 & 26.6 \\
+ & & & spam & 3.7 & 15.6 & 9.7 \\[2pt]
+Spambase & Gaussian (shared cov.) & known & real & 547.5 & 1.6 & 7.8 \\
+ & & & spam & 7.8 & 9.0 & 12.2 \\[2pt]
+\midrule
+Spambase & Logistic regression & none & real & 511.1 & 3.8 & 42.1 \\
+ & & & spam & 2.4 & 16.1 & 10.6 \\[2pt]
+Spambase & Logistic regression & known & real & 548.0 & 0.8 & 8.2 \\
+ & & & spam & 7.0 & 8.5 & 13.5 \\[2pt]
+\bottomrule
+\end{tabular}
