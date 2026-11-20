@@ -11,13 +11,8 @@ review, and how much probability mass actually enters the inspection band.
 
 \paragraph{Forecast quality and the prior correction.}
 % Member 5
-A cost-sensitive filter acts on the value of a forecast, not only on its side of $0.5$, so the quality of
-the probabilities matters as much as the labels. On Spambase, logistic regression gave better forecasts than
-the Gaussian model on every score, and the Gaussian model cost $15\%$ more ($0.142$ against $0.124$ per
-email) while its accuracy was only $1.3$ points lower.
-Scaling its log-odds left its accuracy unchanged at $93.6\%$ yet raised its cost by a third; accuracy did not
-notice, but log-loss and ECE did. Calibration should therefore be checked before a model is deployed, and
-Platt scaling on validation data is a cheap repair (it cut the Gaussian model's cost from $0.142$ to $0.132$).
-When the spam rate changes but spam looks the same, one constant shift of the log-odds restores the Bayes
-rule: an intercept change for logistic regression and a change of priors for the Gaussian model
-(Section~\ref{sec:t5}).
+A cost-sensitive filter acts on the value of a forecast, not only on its side of $0.5$. On Spambase,
+rescaling the logistic model's log-odds left its accuracy at $93.6\%$ but raised its cost by a third, and only
+the probability scores noticed. Calibration should be checked before deployment; Platt scaling on validation
+data is a cheap repair. When only the spam rate changes, one constant shift of the log-odds restores the
+Bayes rule (Section~\ref{sec:t5}).

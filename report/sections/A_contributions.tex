@@ -8,14 +8,11 @@ infrastructure by Member 6. Section~\ref{sec:c6} reports the generated results.
 The assigned review of Member 5's C4 implementation is pending availability of that code.
 % Other members' contributions belong here.
 
-\paragraph{Member 5.} Derived the T5 prior-shift correction in Section~\ref{sec:t5} (posterior-odds
-correction, its form for logistic regression and for the Gaussian model, and the equivalent shifted thresholds)
-with its figure, \path{project4/experiments/t5_prior_correction.py}, and the functions in
-\path{project4/prior_shift.py} that the C5 experiments use. Implemented the C4 forecast-quality measures in
-\path{project4/calibration.py} (log-loss, Brier score, reliability bins, ECE, temperature and Platt scaling)
-and the Task 3 experiment in \path{project4/experiments/task3_calibration.py}, with
-\path{tests/test_calibration.py} and \path{tests/test_prior_shift.py}, using the classifiers by Members 2 and 3
-and the shared infrastructure by Member 6. Section~\ref{sec:c4} reports the results.
+\paragraph{Member 5.} Derived the T5 prior-shift correction (Section~\ref{sec:t5}) and wrote
+\path{project4/prior_shift.py}, used by the C5 experiments. Implemented the C4 measures in
+\path{project4/calibration.py} and the Task 3 experiment \path{project4/experiments/task3_calibration.py},
+with tests, using the classifiers by Members 2 and 3 and the infrastructure by Member 6
+(Section~\ref{sec:c4}).
 
 \subsection{Member 4's inspection-cost experiment}
 \lstinputlisting[
@@ -32,7 +29,7 @@ and the shared infrastructure by Member 6. Section~\ref{sec:c4} reports the resu
   breakindent=1em
 ]{../project4/experiments/task5_inspection.py}
 
-\subsection{Member 5's forecast-quality measures and experiment}
+\subsection{Member 5's calibration measures and prior-shift correction}
 \lstinputlisting[
   language=Python,
   basicstyle=\footnotesize\ttfamily,
@@ -46,21 +43,6 @@ and the shared infrastructure by Member 6. Section~\ref{sec:c4} reports the resu
   breaklines=true,
   breakindent=1em
 ]{../project4/calibration.py}
-\lstinputlisting[
-  language=Python,
-  basicstyle=\footnotesize\ttfamily,
-  numbers=left,
-  numberstyle=\scriptsize,
-  numbersep=0.7em,
-  xleftmargin=2.5em,
-  columns=fullflexible,
-  keepspaces=true,
-  showstringspaces=false,
-  breaklines=true,
-  breakindent=1em
-]{../project4/experiments/task3_calibration.py}
-
-\subsection{Member 5's prior-shift correction}
 \lstinputlisting[
   language=Python,
   basicstyle=\footnotesize\ttfamily,
