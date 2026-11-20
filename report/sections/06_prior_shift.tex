@@ -63,7 +63,8 @@ Which $\pio$ did the model learn? The gradient of the cross-entropy error is
 $\nabla E = \sum_n(\post_n-y_n)\,\phi_n$ (equation~\eqref{eq:t3-grad}), where $\post_n$ is the model's
 probability and $y_n$ the label. Its component for the constant feature is $\sum_n(\post_n-y_n)$, which is zero
 at the optimum. So $\frac1N\sum_n\post_n = N_1/N$: the average predicted probability on the training data
-equals the training spam share. We therefore use $\pio = N_1/N$. With an L2 penalty on $w_0$ this holds only approximately.
+equals the training spam share. We therefore use $\pio = N_1/N$. Our logistic regression does not penalise $w_0$, so this holds exactly;
+with an L2 penalty on $w_0$ it would hold only approximately.
 
 \paragraph{Gaussian model: swap the priors.}
 For Gaussian classes with a shared covariance (Section~\ref{sec:t2})
