@@ -148,73 +148,67 @@ the rates are taken under the same distribution as the one the cost is computed 
 \end{assumptions}
 
 \paragraph{The threshold $\tfrac12$ is suboptimal when $\cfp\ne\cfn$.}
+The accuracy rule and the cost rule disagree only on emails with $\tfrac12\le\post<\tstar$: the
+accuracy rule sends them to spam, the cost rule delivers them. Each of these emails costs the
+accuracy rule extra, so on average it always loses.
 
 \begin{proposition}\label{prop:t3-half}
-Let $\post(x)$ be the true posterior and compare the two-action rules ``spam iff $\post\ge t$''
-for $t=\tfrac12$ and $t=\tstar$. Then
+Let $\post(x)$ be the true posterior and $\cfp>\cfn$, so that $\tstar=\cfp/(\cfp+\cfn)>\tfrac12$.
+For the two-action rules ``spam iff $\post\ge t$'' with $t=\tfrac12$ and $t=\tstar$,
 \[
-  R(\tfrac12) - R(\tstar) = (\cfp+\cfn)\;\E\Big[\,\big|\post(x)-\tstar\big|\;
-     \mathbf 1\{\post(x) \text{ lies between } \tfrac12 \text{ and } \tstar\}\Big] \;\ge\; 0,
+  R(\tfrac12) - R(\tstar) = (\cfp+\cfn)\;\E\big[(\tstar-\post)\,\mathbf 1\{\tfrac12\le\post<\tstar\}\big] \;\ge\; 0 ,
 \]
-where ``between'' includes the endpoint $\tfrac12$ and excludes $\tstar$. The gap is strictly positive whenever
-$\cfp\neq\cfn$ and $\post(x)$ falls strictly between $\tfrac12$ and $\tstar$ with positive probability.
+and the gap is positive whenever some emails have $\tfrac12<\post<\tstar$.
+(If $\cfp<\cfn$ the roles of $\tfrac12$ and $\tstar$ swap; if $\cfp=\cfn$ the two rules coincide.)
 \end{proposition}
 
 \begin{proof}
-For a two-action rule $\delta$, $R(\delta)=\E[\ell_\delta(x)]$ with $\ell_\delta(x)=\cfn\post(x)$ if
-$\delta$ delivers and $\cfp(1-\post(x))$ if it sends to spam. The two rules act differently only on the set
-$A$ where $\post(x)$ lies between $\tfrac12$ and $\tstar$. Take $\cfp>\cfn$, so $\tstar>\tfrac12$ and
-$A=\{\tfrac12\le\post<\tstar\}$. On $A$ the rule with $t=\tfrac12$ sends to spam and the rule with $t=\tstar$
-delivers, and
+Outside $\tfrac12\le\post<\tstar$ both rules take the same action. Inside it, the accuracy rule pays
+$\cfp(1-\post)$ and the cost rule pays $\cfn\post$, a difference of
 \[
-  \cfp(1-\post)-\cfn\post = \cfp-(\cfp+\cfn)\post = (\cfp+\cfn)(\tstar-\post) > 0 .
+  \cfp(1-\post)-\cfn\post = (\cfp+\cfn)(\tstar-\post) > 0 .
 \]
-Taking expectations over $A$ gives the formula. The case $\cfp<\cfn$ is symmetric, with
-$A=\{\tstar\le\post<\tfrac12\}$ and integrand $(\cfp+\cfn)(\post-\tstar)$. If $\cfp=\cfn$ then $A$ is empty.
+Averaging over emails gives the formula.
 \end{proof}
 
-So with our costs ($\cfp=10$, $\cfn=1$, $\tstar=10/11\approx0.909$) the accuracy rule pays an excess
-of $11(\tstar-\post)$ for every real-looking email with $\tfrac12\le\post<\tstar$ that it sends to
-spam. In the analytic model of Section~\ref{sec:t6} ($\mu=1$, $\pio=0.4$) the formula gives a gap of
-$0.461$ per email. This matches the difference between the two two-action rules in
-Table~\ref{tab:t6} ($0.772-0.311$) to every printed digit. Since $\tstar$ minimises $\ell_\delta(x)$
-for every $x$, it is optimal among \emph{all} two-action rules, not only these two.
+With our costs ($\cfp=10$, $\cfn=1$, $\tstar=10/11\approx0.909$), every email with
+$0.5\le\post<0.909$ that the accuracy rule sends to spam costs an extra $11(\tstar-\post)$. In the
+analytic model of Section~\ref{sec:t6} ($\mu=1$, $\pio=0.4$) this averages to $0.461$ per email, exactly
+the gap $0.772-0.311$ between the two rules in Table~\ref{tab:t6}. Since $\tstar$ gives the cheaper
+action for every single email, it is the best of \emph{all} two-action rules, not only these two.
 
 \paragraph{The Task 1 thresholds need calibrated probabilities.}
-A classifier is \emph{calibrated} if $q(s) = \Prob(y=1\mid s(x)=s)$ equals $s$. The argument above
-used the true posterior. A rule that sees $x$ only through the score $s$ can do no better than
-the posterior given the score, $q(s)$.
+A model's score $s$ need not be a true probability. What matters is what the score really means,
+$q(s)=\Prob(y=1\mid s(x)=s)$. The thresholds work on $s$ directly only if $q(s)=s$, i.e.\ if the model
+is \emph{calibrated}.
 
 \begin{proposition}\label{prop:t3-calib}
-Among rules that act on $s(x)$, the minimum expected cost is attained by applying the Task 1 rule to
-$q(s)$: deliver if $q(s)\le\thz$, spam if $q(s)\ge\tho$, inspect in between (two-action: spam iff
-$q(s)\ge\tstar$). Consequently:
+For rules that see an email only through its score $s$:
 \begin{enumerate}[label=(\roman*),itemsep=1pt]
-  \item if the classifier is calibrated, the thresholds $\thz,\tho,\tstar$ applied to $s$ itself are optimal;
-  \item if $q$ is continuous and strictly increasing but $q\neq\mathrm{id}$, the optimal two-action
-        threshold on $s$ is $q^{-1}(\tstar)$, which differs from $\tstar$ unless $q(\tstar)=\tstar$;
-  \item thresholding $s$ at $\tstar$ is optimal for \emph{every} cost ratio $\cfp/\cfn$ if and only if
-        $q(t)=t$ for all $t\in(0,1)$, i.e.\ the scores are calibrated.
+  \item the best rule is the Task 1 rule applied to $q(s)$: deliver if $q(s)\le\thz$, spam if
+        $q(s)\ge\tho$, inspect in between;
+  \item if the model is calibrated, using $\thz$, $\tho$ and $\tstar$ directly on $s$ is optimal;
+  \item if it is not (with $q$ increasing), the best two-action cut on $s$ is $q^{-1}(\tstar)$ rather than
+        $\tstar$, and cutting at $\tstar$ is right for \emph{every} cost ratio only if the model is calibrated.
 \end{enumerate}
 \end{proposition}
 
 \begin{proof}
-By the tower property, $\E[L(a,y)] = \E\big[\E[L(a,y)\mid s]\big]$, and for a rule acting on $s$ the inner
-expectation is $\cfn q(s)$, $\cfp(1-q(s))$ or $\ci$ for the three actions. This is the posterior expected
-loss of Section~\ref{sec:decision} with $\post$ replaced by $q(s)$, so it is minimised by the Task 1 rule
-applied to $q(s)$. (i) is the case $q(s)=s$. For (ii), $q(s)\ge\tstar\iff s\ge q^{-1}(\tstar)$ since $q$ is
-strictly increasing. For (iii), as $\cfp/\cfn$ ranges over $(0,\infty)$, $\tstar$ ranges over $(0,1)$, so
-$q^{-1}(t)=t$ must hold for every $t$.
+Given the score, an email is spam with probability $q(s)$, so the three actions have expected losses
+$\cfn q(s)$, $\cfp(1-q(s))$ and $\ci$. This is the problem of Section~\ref{sec:decision} with $\post$
+replaced by $q(s)$, which gives (i), and (ii) is the case $q(s)=s$. Since $q$ is increasing,
+$q(s)\ge\tstar\iff s\ge q^{-1}(\tstar)$. As the cost ratio varies, $\tstar$ takes every value in
+$(0,1)$, so cutting at $\tstar$ is always right only if $q^{-1}(t)=t$ for every $t$, which is (iii).
 \end{proof}
 
-For example, take an overconfident model that reports $s=\sigm(2a)$ when the true posterior is
-$\sigm(a)$; this is temperature $T=\tfrac12$. Then $q(s)=\sigm\big(\tfrac12\logit s\big)$, and the cost-optimal threshold on $s$ is
-$\sigm(2\logit\tstar)\approx0.990$, not $0.909$. Its accuracy at threshold $\tfrac12$ is unchanged,
-because $\sigm(2a)\ge\tfrac12\iff a\ge0$. Accuracy depends only on the sign of the log-odds, while the
-cost-optimal decision depends on its value. This is the effect Section~\ref{sec:calibration} measures.
+For example, take an overconfident model that doubles the true log-odds, reporting $s=\sigm(2a)$ when
+the truth is $\sigm(a)$. Its accuracy is unchanged, because $\sigm(2a)\ge\tfrac12\iff a\ge0$. But
+$q(s)=\sigm\big(\tfrac12\logit s\big)$, so the right cut on its scores moves from $0.909$ to
+$\sigm(2\logit\tstar)=\sigm(2\log10)=100/101\approx0.990$. Accuracy looks only at the sign of the
+log-odds, while cost depends on their size. This is the effect Section~\ref{sec:calibration} measures.
 
 \begin{assumptions}
-Loss matrix of Section~\ref{sec:decision}; for (ii)--(iii), $q$ continuous and strictly increasing on the
+Loss matrix of Section~\ref{sec:decision}; for (iii), $q$ continuous and strictly increasing on the
 range of the scores.
 \end{assumptions}
 
