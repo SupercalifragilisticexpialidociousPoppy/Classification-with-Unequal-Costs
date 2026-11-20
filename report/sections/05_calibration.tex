@@ -88,12 +88,14 @@ Inspection always routes the message correctly and costs $0.3$ for either label.
 \label{sec:c4}
 % Member 5. Numbers from python -m project4.experiments.task3_calibration (results/c4_*.csv).
 
-We score the forecasts $q$ of both classifiers on the test part of each of the 20 splits, using the
-log-loss (with $q$ clipped to $[10^{-12},1-10^{-12}]$), the Brier score and $\widehat{\mathrm{ECE}}$ with
-10 equal-width bins (equal-count bins agree within $0.003$). Costs are for the Bayes rule with $\cfp=10$,
-$\cfn=1$, $\ci=0.3$, and hyperparameters are chosen by validation log-loss. The synthetic data are $4{,}601$
-points from two 2-D Gaussian classes with a shared covariance and $\pio=0.4$, so both models are correctly
-specified; Spambase uses $\log(1+x)$ and standardisation.
+We now score the forecasts $q$ of both classifiers on real data. On the test part of each of the 20 splits
+we compute the log-loss, the Brier score and $\widehat{\mathrm{ECE}}$ (10 equal-width bins), together with
+the cost of the Bayes rule for $\cfp=10$, $\cfn=1$, $\ci=0.3$. To avoid $\log 0$, $q$ is clipped to
+$[10^{-12},1-10^{-12}]$. Hyperparameters are chosen on the validation part by log-loss.
+
+We use two data sets. The \emph{synthetic} data are $4{,}601$ points from two 2-D Gaussian classes with a
+shared covariance and $\pio=0.4$. Here both models' assumptions hold exactly, so they should be calibrated:
+this checks the code. \emph{Spambase} uses $\log(1+x)$ features, standardised.
 
 \begin{table}[ht]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
@@ -107,7 +109,8 @@ posterior; ``+ Platt'' rows are re-calibrated on the validation part.}
 \paragraph{Results.}
 On synthetic data both models match the true posterior (log-loss $0.433$ against $0.432$, Brier $0.139$)
 and their reliability curves lie on the diagonal (Figure~\ref{fig:c4-rel}, top). Even the true posterior has
-$\widehat{\mathrm{ECE}}\approx0.03$: with $919$ test emails per split, bin noise alone gives this much. On
+$\widehat{\mathrm{ECE}}\approx0.03$: with only $919$ test emails per split, the spam fraction in each bin is
+noisy, so ECE is never exactly $0$. On
 Spambase logistic regression is better on every score (log-loss $0.185$ against $0.224$, Brier $0.050$
 against $0.061$, ECE $0.021$ against $0.039$) and cheaper ($0.124$ against $0.142$ per email), although the
 accuracies differ by only $1.3$ points. The Gaussian model underpredicts spam for $q$ between $0.3$ and $0.6$
@@ -117,7 +120,7 @@ from Gaussian even after $\log(1+x)$.
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.85\linewidth]{c4_reliability.pdf}
-\caption{Reliability diagrams, test parts of all 20 splits pooled. Points above the diagonal mean the model
+\caption{Reliability diagrams, using the test parts of all 20 splits together. Points above the diagonal mean the model
 underpredicts spam. Histograms: forecasts per equal-width bin (log scale).}
 \label{fig:c4-rel}
 \end{figure}

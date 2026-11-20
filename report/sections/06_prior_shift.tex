@@ -6,8 +6,8 @@
 % Member 5
 
 A filter is trained where a share $\pio$ of emails is spam, but at deployment the share may be $\pion$.
-Suppose spam still \emph{looks} the same: $p(x\mid y)$ is unchanged and only the class proportions move
-(label shift). By Bayes' rule the posterior odds are the likelihood ratio times the prior odds,
+Suppose spam still \emph{looks} the same: $p(x\mid y)$ is unchanged and only the class proportions move.
+This is called label shift. By Bayes' rule the posterior odds are the likelihood ratio times the prior odds,
 \begin{equation}
   \frac{\Prob(y=1\mid x)}{\Prob(y=0\mid x)} = \frac{p(x\mid y=1)}{p(x\mid y=0)}\cdot\frac{\pio}{\piz},
   \label{eq:t5-odds-train}
@@ -20,7 +20,9 @@ removes the unknown likelihood ratio:
   \label{eq:t5-odds}
 \end{equation}
 So we multiply the model's odds by the new prior odds over the old ones; $p(x\mid y)$ is never needed.
-Taking logarithms, with $a(x)=\logit\post(x)$ the log posterior odds,
+Here $\post=\Prob(y=1\mid x)$ is the model's output (written $q$ in Section~\ref{sec:calibration}).
+Taking logarithms turns the product into a sum. With $a(x)=\logit\post(x)=\log\frac{\post(x)}{1-\post(x)}$,
+the log posterior odds of the lectures,
 \begin{equation}
   a'(x) = a(x) + \lshift, \qquad
   \lshift = \log\frac{\pion}{\pizn} - \log\frac{\pio}{\piz}, \qquad
@@ -28,21 +30,26 @@ Taking logarithms, with $a(x)=\logit\post(x)$ the log posterior odds,
   \label{eq:t5-shift}
 \end{equation}
 the same shift for every email.
+
 \emph{Example.} Trained at $\pio=0.5$ and deployed at $\pion=0.1$, all odds are divided by $9$. An email
 with $\post=0.98$ (odds $49$) gets $\post'\approx0.845$, so with the thresholds $\thz=0.3$, $\tho=0.97$ of
 Section~\ref{sec:decision} it is inspected instead of sent to the spam folder.
 
 \paragraph{In our two models.}
 For logistic regression, $a(x)=w^\top\phi(x)$ with $\phi_0=1$, so adding $\lshift$ only replaces $w_0$ by
-$w_0+\lshift$. The training share to use is $\pio=N_1/N$: the gradient \eqref{eq:t3-grad} has
-$\sum_n(\post_n-y_n)=0$ in its constant component, so the mean fitted probability equals $N_1/N$ (exactly,
-since our intercept is not penalised). For the Gaussian model the priors enter $a(x)$ only through
+$w_0+\lshift$. Which $\pio$ did the model learn? At the fitted weights the gradient \eqref{eq:t3-grad} is zero. Its
+component for $\phi_0=1$ is $\sum_n(\post_n-y_n)$, so $\sum_n\post_n=\sum_n y_n=N_1$: the average fitted
+probability equals the training spam share $N_1/N$, which is the $\pio$ to use (exactly, since our intercept
+is not penalised). For the Gaussian model the priors enter $a(x)$ only through
 $\log(\pio/\piz)$ (Section~\ref{sec:t2}), for shared and for class-specific covariances, so replacing them by
 $\pion,\pizn$ changes $a(x)$ by exactly $\lshift$: the correction is ``use the new priors''.
 
 \paragraph{Keep the probability, move the thresholds.}
-Since $\sigm$ is increasing, $\post'\ge\theta_k$ exactly when $\post\ge\sigm(\logit\theta_k-\lshift)$. With
-$r=e^{\lshift}$ the thresholds on the uncorrected $\post$ become
+Since $\sigm$ is increasing,
+\[
+  \post'\ge\theta_k \iff \logit\post+\lshift\ge\logit\theta_k \iff \post\ge\sigm(\logit\theta_k-\lshift).
+\]
+With $r=e^{\lshift}$ the thresholds on the uncorrected $\post$ therefore become
 \begin{equation}
   \theta_k^{\text{shift}} = \frac{\theta_k}{\theta_k + r\,(1-\theta_k)}, \qquad k=0,1,
   \label{eq:t5-thresholds}
