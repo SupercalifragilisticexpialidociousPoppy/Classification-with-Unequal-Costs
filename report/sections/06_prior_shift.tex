@@ -1,4 +1,147 @@
-% TODO (Members 5 and 1): replace this placeholder.
 \section{Prior shift}
 \label{sec:prior-shift}
-\emph{To be written by Members 5 and 1.}
+
+\subsection{Correcting for a new spam rate (T5)}
+\label{sec:t5}
+% Member 5
+
+A filter is trained on emails of which a share $\pio$ is spam, but after deployment the share can be
+different, say $\pion$. A spam campaign can double it overnight, and a company mailbox may see much less
+spam than the training data had. Suppose spam still \emph{looks} the same: the class-conditional densities
+$p(x\mid y)$ do not change and only the class proportions do. This is called \emph{label shift} or
+\emph{prior shift}. We show that the model's probabilities can then be corrected with one number, and that
+the correction is a familiar step in both of our models.
+
+\paragraph{The correction.}
+Bayes' rule, as in the lectures (class $\mathcal C_1$ is spam, $y=1$), gives
+\[
+  \Prob(y=1\mid x) = \frac{p(x\mid y=1)\,\pio}{p(x\mid y=1)\,\pio + p(x\mid y=0)\,\piz}.
+\]
+The denominator is the same for both classes, so the ratio of the two posteriors (the posterior odds) is
+\begin{equation}
+  \frac{\Prob(y=1\mid x)}{\Prob(y=0\mid x)} = \frac{p(x\mid y=1)}{p(x\mid y=0)}\cdot\frac{\pio}{\piz}.
+  \label{eq:t5-odds-train}
+\end{equation}
+At deployment the same equation holds with the new priors and the \emph{same} likelihood ratio, because
+$p(x\mid y)$ has not changed:
+$\Prob'(y=1\mid x)/\Prob'(y=0\mid x) = \frac{p(x\mid y=1)}{p(x\mid y=0)}\cdot\pion/\pizn$.
+Dividing the two equations removes the unknown likelihood ratio:
+\begin{equation}
+  \boxed{\;\frac{\Prob'(y=1\mid x)}{\Prob'(y=0\mid x)}
+  = \frac{\Prob(y=1\mid x)}{\Prob(y=0\mid x)}\cdot\frac{\pion/\pizn}{\pio/\piz}\;}
+  \label{eq:t5-odds}
+\end{equation}
+In words: \emph{multiply the model's odds by the new prior odds divided by the old prior odds.} We only
+need the model's output $\post$ and the two priors. We never need $p(x\mid y)$ itself.
+
+\paragraph{As a shift of the log-odds.}
+Take logarithms. With $a(x) = \logit\post(x) = \log\frac{\post(x)}{1-\post(x)}$, the log posterior odds of
+the lectures (so that $\post=\sigm(a)$), equation \eqref{eq:t5-odds} becomes
+\begin{equation}
+  a'(x) = a(x) + \lshift, \qquad
+  \lshift = \log\frac{\pion}{\pizn} - \log\frac{\pio}{\piz}, \qquad
+  \post'(x) = \sigm\big(\logit\post(x) + \lshift\big).
+  \label{eq:t5-shift}
+\end{equation}
+The shift $\lshift$ does not depend on $x$: every email's log-odds move by the same amount, down if spam
+has become rarer ($\lshift<0$) and up if it has become more common.
+
+\emph{Example.} Train at $\pio=0.5$ and deploy at $\pion=0.1$. The prior odds fall from $1$ to $1/9$, so
+every model's odds are divided by $9$ ($\lshift=-\log 9\approx-2.20$). An email with $\post=0.98$ (odds
+$49$) gets odds $49/9\approx5.4$, so $\post'\approx0.845$. With $\cfp=10$, $\cfn=1$ and $\ci=0.3$
+(thresholds $\thz=0.3$, $\tho=0.97$ from Section~\ref{sec:decision}), the uncorrected filter would send this
+email to the spam folder. The corrected filter holds it for inspection, because when only $10\%$ of the
+traffic is spam the same evidence is less convincing.
+
+\paragraph{Logistic regression: only the intercept changes.}
+In logistic regression $a(x) = w^\top\phi(x) = w_0 + \sum_{j\ge1} w_j\phi_j(x)$, with the constant
+feature $\phi_0=1$. Adding $\lshift$ to $a(x)$ is the same as replacing $w_0$ by $w_0+\lshift$ and keeping
+all the other weights. The corrected model is still a logistic regression, and in feature space its decision
+boundaries move parallel to themselves.
+
+Which $\pio$ did the model learn? In the lectures (Section~\ref{sec:models}) the gradient of the
+cross-entropy error is $\nabla E = \sum_n(\post_n-y_n)\,\phi(x_n)$, where $\post_n$ is the model's
+probability and $y_n$ the label. Its component for the constant feature is $\sum_n(\post_n-y_n)$, which is zero
+at the optimum. So $\frac1N\sum_n\post_n = N_1/N$: the average predicted probability on the training data
+equals the training spam share. We therefore use $\pio = N_1/N$. With an L2 penalty on $w_0$ this holds only approximately.
+
+\paragraph{Gaussian model: swap the priors.}
+For Gaussian classes with a shared covariance (lectures, Section~\ref{sec:models})
+\[
+  a(x) = w^\top x + w_0, \qquad
+  w_0 = -\tfrac12\mu_1^\top\Sigma^{-1}\mu_1 + \tfrac12\mu_0^\top\Sigma^{-1}\mu_0 + \log\frac{\pio}{\piz}.
+\]
+The priors enter only through the last term. Replacing $\pio,\piz$ by $\pion,\pizn$ changes $w_0$ by exactly
+$\lshift$, which is the same correction. This is the lecture result that changing the priors moves the
+boundary parallel to itself. With class-specific covariances, $a(x)$ also contains $\log\pio-\log\piz$ as its
+only prior term, so the same holds. The maximum-likelihood priors are $\hat\pi_k=N_k/N$, so again
+$\pio$ is the training share. For a generative model the correction is simply ``use the new priors''.
+
+\paragraph{Keep the probability, move the thresholds.}
+Instead of correcting $\post$ we can keep the model's $\post$ and move the thresholds of
+Section~\ref{sec:decision}. Since $\sigm$ is increasing,
+\[
+  \post' \ge \tho \iff \logit\post + \lshift \ge \logit\tho \iff \post \ge \sigm(\logit\tho - \lshift),
+\]
+and the same for $\thz$ (and for $\tstar$ when there is no inspect band). So, with $r = e^{\lshift}$,
+\begin{equation}
+  \theta_k^{\text{shift}} = \sigm\big(\logit\theta_k - \lshift\big) = \frac{\theta_k}{\theta_k + r\,(1-\theta_k)},
+  \qquad k=0,1,
+  \label{eq:t5-thresholds}
+\end{equation}
+applied to the uncorrected $\post$, gives the same action for every email as the Bayes rule applied to
+$\post'$ (on a computer, an email lying exactly on a threshold can come out differently through rounding). In the example above ($r=1/9$) the thresholds move from $(0.30,\,0.97)$ to $(0.79,\,0.997)$.
+The filter now delivers anything with $\post\le0.79$ and sends to spam only above $0.997$.
+Figure~\ref{fig:t5} shows both views. Moving the thresholds leaves the model untouched. Correcting $\post$ is
+the better choice when the probabilities themselves are used, for example when they are shown to a user.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{t5_prior_correction.pdf}
+\caption{Prior-shift correction for a model trained at $\pio=0.5$. Left: corrected probability $\post'$
+against the model's $\post$ (equation~\eqref{eq:t5-shift}). Right: the equivalent thresholds on the
+uncorrected $\post$ (equation~\eqref{eq:t5-thresholds}) for every deployment share $\pion$. The shaded band
+is the inspect region. Generated by \texttt{experiments/t5\_prior\_correction.py}.}
+\label{fig:t5}
+\end{figure}
+
+\paragraph{Why this is the right correction.}
+If the trained model's posterior is exact, equation~\eqref{eq:t5-odds} gives the exact posterior at the new
+prior. The corrected decisions are then the Bayes decisions for the deployment population: no rule can have
+a lower expected loss there (Section~\ref{sec:decision}). The uncorrected filter uses the wrong posterior, so
+it can only do as well or worse. Section~\ref{sec:c5} measures how much worse.
+
+\begin{assumptions}
+\begin{enumerate}[label=(\roman*),itemsep=1pt,topsep=2pt]
+  \item \emph{Label shift only:} $p(x\mid y)$ is the same at training and deployment. If spam changes its
+        wording, the likelihood ratio in \eqref{eq:t5-odds-train} changes and no single $\lshift$ can fix it.
+  \item \emph{Calibrated training probabilities:} the correction multiplies the model's odds. If those odds
+        are wrong by some factor, the corrected odds are wrong by the same factor. A constant shift cannot
+        fix an over-confident model; that needs a change of slope such as temperature or Platt scaling
+        (Section~\ref{sec:c4}). So check calibration first, and correct for the prior second.
+  \item \emph{Known priors:} $\pio$ is the training share. $\pion$ must be known or estimated, for example
+        from a small labelled sample of recent emails. If $\pion$ is wrong, we get the Bayes rule for the
+        wrong prior.
+  \item Both priors lie strictly between $0$ and $1$, so all odds are finite.
+\end{enumerate}
+\end{assumptions}
+
+\medskip\noindent\emph{Numerical check.} \texttt{tests/test\_prior\_shift.py} verifies the following:
+\begin{itemize}[itemsep=1pt,topsep=2pt]
+  \item On Gaussian data, correcting the exact posterior at $\pio=0.5$ gives the exact posterior at each
+        $\pion\in\{0.05,\dots,0.8\}$ to $10^{-9}$, for shared and for class-specific covariances.
+  \item Fitting logistic regression on Gaussian data at two spam shares gives the same slopes and intercepts
+        that differ by $\lshift$.
+  \item The threshold form \eqref{eq:t5-thresholds} gives the same actions as correcting $\post$, on
+        $100{,}000$ random probabilities, with and without an inspect band.
+  \item After a simulated shift, the corrected decisions coincide with the oracle decisions and have a lower
+        realized loss than the uncorrected ones.
+\end{itemize}
+The functions are in \texttt{prior\_shift.py}.
+
+\subsection{Experiments (C5)}
+\label{sec:c5}
+% TODO (Member 1): synthetic and Spambase prior-shift experiments comparing uncorrected,
+% corrected (project4.prior_shift.adjust_posterior / bayes_action_shifted) and oracle decisions;
+% realized loss against deployment prior; confusion matrices.
+\emph{To be written by Member 1.}

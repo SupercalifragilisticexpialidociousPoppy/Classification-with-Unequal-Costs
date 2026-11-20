@@ -17,6 +17,8 @@ The report in `report/` includes them directly. Build it with
 `cd report && pdflatex main && bibtex main && pdflatex main && pdflatex main`,
 or import the repo into Overleaf with its GitHub sync.
 
+
+
 ## Layout and owners
 
 ```
@@ -29,8 +31,10 @@ project4/
   analytic.py      T6 (M6)  closed-form 1-D Gaussian model: accuracy, cost, rejection, Bayes risk
   models/gaussian.py    C2 (M3)  GaussianClassifier(shared_cov, reg).fit(X, y).predict_proba(X)
   models/logistic.py    C3 (M2)  LogisticRegression(l2).fit(X, y).predict_proba(X)
-  calibration.py        C4 (M5)  log_loss, brier, reliability_bins
+  calibration.py        C4 (M5)  log_loss, brier, reliability_bins, ece, temperature_scale, platt_fit
+  prior_shift.py        T5 (M5)  adjust_posterior, shifted_thresholds, bayes_action_shifted
   experiments/
+    t5_prior_correction.py T5 (M5)  figure of the prior-shift correction
     t6_analytic.py        T6 (M6)  analytic figures and the accuracy-vs-cost table
     task2_cost_sweep.py   C3 (M2)
     task3_calibration.py  C4 (M5)
