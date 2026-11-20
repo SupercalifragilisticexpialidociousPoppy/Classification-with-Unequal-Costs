@@ -1,4 +1,87 @@
-% TODO (Members 4 and 5): replace this placeholder.
 \section{Scoring rules and calibration}
 \label{sec:calibration}
-\emph{To be written by Members 4 and 5.}
+
+\subsection{What a probability forecast is scored on}
+Write $\post=\Prob(Y=1\mid X=x)$ for the true spam probability and $q$ for a reported
+forecast. Two forecasts can give the same spam label and assign very different probabilities
+to an expensive mistake. For $N$ pairs $(q_i,y_i)$ the binary log-loss and Brier score are
+\[
+ -\frac{1}{N}\sum_{i=1}^N[y_i\log q_i+(1-y_i)\log(1-q_i)],
+ \qquad \frac{1}{N}\sum_{i=1}^N(q_i-y_i)^2 .
+\]
+A loss is \emph{strictly proper} if reporting the true probability uniquely minimizes its
+expected value. This concerns expectation over the outcome, even when an individual message
+turns out to have been assigned a small probability.
+
+\paragraph{Log-loss.}
+For $0<\post,q<1$, the excess conditional loss over reporting $\post$ is
+\[
+ \post\log\frac{\post}{q}+(1-\post)\log\frac{1-\post}{1-q}.
+\]
+This is the Bernoulli Kullback--Leibler divergence. Applying $-\log u\geq 1-u$ to
+$q/\post$ and $(1-q)/(1-\post)$ gives a lower bound of zero, with equality only at $q=\post$.
+A forecast that assigns zero probability to a possible outcome has infinite expected loss.
+For $\post=0$ the expected loss is $-\log(1-q)$, uniquely minimized at zero. For $\post=1$
+it is $-\log q$, uniquely minimized at one.
+\begin{assumptions}Binary outcomes, the natural logarithm, and the convention
+$0\log 0=0$ for zero-weight terms. The proof uses the unclipped score. Numerical clipping
+gives identical scores to forecasts clipped to the same value.\end{assumptions}
+
+\paragraph{Brier score.}
+Expanding the conditional expectation gives
+\[
+ \post(1-q)^2+(1-\post)q^2=\post(1-\post)+(q-\post)^2 .
+\]
+The excess loss is exactly $(q-\post)^2$, so the same unique minimizer applies on the
+entire closed interval, including deterministic outcomes.
+\begin{assumptions}$Y$ is binary and $q\in[0,1]$. The score uses the squared error for the
+spam probability alone.\end{assumptions}
+
+\subsection{Reliability, resolution and uncertainty}
+Let $Q$ be a random forecast, $\eta(Q)=\E[Y\mid Q]$ the spam frequency conditional on that
+forecast, and $\bar p=\E[Y]$. Calibration means $\eta(Q)=Q$ almost surely. Conditioning
+on $Q$ makes the cross term in $(Q-Y)^2=[(Q-\eta)+(\eta-Y)]^2$ vanish.
+The law of total variance then gives
+\[
+ \E[(Q-Y)^2]=
+ \underbrace{\E[(Q-\eta(Q))^2]}_{\text{reliability penalty}}
+ -\underbrace{\mathrm{Var}(\eta(Q))}_{\text{resolution}}
+ +\underbrace{\bar p(1-\bar p)}_{\text{uncertainty}} .
+\]
+A constant forecast equal to the prevalence is calibrated but has zero resolution.
+A forecast that separates groups with different spam frequencies gains resolution.
+\begin{assumptions}The forecast and binary label refer to the same evaluation population.
+Conditional means are taken at the forecast values actually issued.\end{assumptions}
+
+For a reliability diagram, partition $[0,1]$ into disjoint bins. In each nonempty bin $b$,
+plot its mean forecast $\bar q_b$ horizontally and its observed spam fraction $\bar y_b$
+vertically. Points above the diagonal indicate underprediction. A count histogram shows how
+many messages support each point. Equal-width bins use fixed probability intervals, while
+equal-count bins aim for similar numbers of observations. The count-weighted expected
+calibration error estimate is
+\[
+ \widehat{\mathrm{ECE}}=\sum_{b:n_b>0}\frac{n_b}{N}\,|\bar q_b-\bar y_b| .
+\]
+Under the empirical distribution, grouping identical forecasts gives the exact Brier identity
+above. With wider bins, using $\bar q_b$ and $\bar y_b$ gives the exact bin-grouped decomposition
+for forecasts replaced by their bin means. Within-bin variation can change the original
+score, and opposite calibration errors can cancel in a reliability diagram.
+
+\subsection{Identical labels, different bills}
+Consider two groups of ten emails. The first contains two spam emails, the second eight.
+Model A reports their observed frequencies $1/5$ and $4/5$. Model B sharpens these forecasts
+by multiplying their log-odds by three, equivalently using temperature $T=1/3$.
+The odds $1/4$ and $4$ become $1/64$ and $64$, so the forecasts become $1/65$ and $64/65$.
+The transformation preserves the side of $0.5$ for every message. Both models assign
+identical labels and correctly classify $16/20$ at that threshold.
+
+With $(\cfp,\cfn,\ci)=(10,1,0.3)$ the inspection band is $(0.3,0.97)$. Both models deliver
+the first group, at a cost of two missed spam emails. Model A inspects all ten emails
+in the second group, giving total cost $2+10(0.3)=5$, or $0.25$ per email. Model B sends
+the second group straight to spam. Its two false positives bring the total to $2+2(10)=22$,
+or $1.10$ per email. The labels at $0.5$ hide the decisions that cross the upper
+inspection threshold.
+\begin{assumptions}The groups and labels are fixed for this realized-cost example.
+Inspection always routes the message correctly and costs $0.3$ for either label.\end{assumptions}
+
+% Member 5's C4 empirical calibration diagrams and metrics belong here.

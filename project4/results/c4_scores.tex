@@ -1,0 +1,17 @@
+\begin{tabular}{llrrrrrr}
+\toprule
+Data & Model & Accuracy & Log-loss & Brier & ECE & Cost & Inspected \\
+\midrule
+Synthetic & Bayes (true $p$) & 0.798\,{\scriptsize$\pm$0.002} & 0.432\,{\scriptsize$\pm$0.004} & 0.139\,{\scriptsize$\pm$0.001} & 0.032\,{\scriptsize$\pm$0.002} & 0.208\,{\scriptsize$\pm$0.002} & 0.511\,{\scriptsize$\pm$0.003} \\
+ & Gaussian & 0.799\,{\scriptsize$\pm$0.002} & 0.433\,{\scriptsize$\pm$0.004} & 0.139\,{\scriptsize$\pm$0.001} & 0.029\,{\scriptsize$\pm$0.002} & 0.207\,{\scriptsize$\pm$0.002} & 0.502\,{\scriptsize$\pm$0.004} \\
+ & Gaussian + Platt & 0.800\,{\scriptsize$\pm$0.002} & 0.433\,{\scriptsize$\pm$0.004} & 0.139\,{\scriptsize$\pm$0.001} & 0.033\,{\scriptsize$\pm$0.002} & 0.208\,{\scriptsize$\pm$0.002} & 0.499\,{\scriptsize$\pm$0.006} \\
+ & Logistic & 0.800\,{\scriptsize$\pm$0.002} & 0.433\,{\scriptsize$\pm$0.004} & 0.139\,{\scriptsize$\pm$0.001} & 0.030\,{\scriptsize$\pm$0.002} & 0.208\,{\scriptsize$\pm$0.002} & 0.507\,{\scriptsize$\pm$0.004} \\
+ & Logistic + Platt & 0.799\,{\scriptsize$\pm$0.002} & 0.434\,{\scriptsize$\pm$0.004} & 0.139\,{\scriptsize$\pm$0.001} & 0.033\,{\scriptsize$\pm$0.002} & 0.208\,{\scriptsize$\pm$0.002} & 0.500\,{\scriptsize$\pm$0.006} \\
+\midrule
+Spambase & Gaussian & 0.923\,{\scriptsize$\pm$0.002} & 0.224\,{\scriptsize$\pm$0.006} & 0.061\,{\scriptsize$\pm$0.001} & 0.039\,{\scriptsize$\pm$0.002} & 0.142\,{\scriptsize$\pm$0.006} & 0.172\,{\scriptsize$\pm$0.002} \\
+ & Gaussian + Platt & 0.928\,{\scriptsize$\pm$0.002} & 0.208\,{\scriptsize$\pm$0.004} & 0.058\,{\scriptsize$\pm$0.001} & 0.024\,{\scriptsize$\pm$0.001} & 0.132\,{\scriptsize$\pm$0.005} & 0.217\,{\scriptsize$\pm$0.003} \\
+ & Logistic & 0.936\,{\scriptsize$\pm$0.002} & 0.186\,{\scriptsize$\pm$0.005} & 0.050\,{\scriptsize$\pm$0.001} & 0.021\,{\scriptsize$\pm$0.001} & 0.124\,{\scriptsize$\pm$0.004} & 0.205\,{\scriptsize$\pm$0.003} \\
+ & Logistic + Platt & 0.936\,{\scriptsize$\pm$0.002} & 0.185\,{\scriptsize$\pm$0.004} & 0.050\,{\scriptsize$\pm$0.001} & 0.024\,{\scriptsize$\pm$0.001} & 0.118\,{\scriptsize$\pm$0.003} & 0.217\,{\scriptsize$\pm$0.004} \\
+\bottomrule
+\multicolumn{8}{l}{\scriptsize\textit{PREVIEW: scikit-learn stand-in models; regenerate after the team models are merged.}} \\
+\end{tabular}
