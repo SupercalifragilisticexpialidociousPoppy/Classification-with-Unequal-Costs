@@ -1,5 +1,276 @@
 \section{Gaussian and logistic classifiers}
 \label{sec:models}
 
-\input{sections/03a_gaussian}   % T2 (Member 2)
-% \input{sections/03b_logistic} % T3 (Member 3)
+Both models produce a posterior $\post(x)=\Prob(y=1\mid x)$, which the decision rule of
+Section~\ref{sec:decision} turns into an action. Section~\ref{sec:t2} derives the Gaussian
+generative classifiers, Section~\ref{sec:t3-logreg} logistic regression, and
+Section~\ref{sec:t3-cost} the expected cost of any threshold rule. Section~\ref{sec:c2} reports how
+the Gaussian classifiers fit Spambase.
+
+%------------------------------------------------------------------------------
+\subsection{Gaussian generative classifiers (T2)}
+\label{sec:t2}
+% TODO (Member 2): ML estimates, shared vs class-specific covariance, a(x) linear/quadratic,
+% boundary for any threshold t, shrinkage rule, link to logistic-regression weights.
+\emph{To be written by Member 2.}
+
+%------------------------------------------------------------------------------
+\subsection{Logistic regression (T3)}
+\label{sec:t3-logreg}
+% Member 3
+
+\paragraph{Model and likelihood.}
+Append a constant $1$ to each input, $\phi_n=(1,x_n^\top)^\top\in\mathbb R^{d+1}$, so the first weight
+$w_0$ is the bias. Logistic regression models the posterior directly,
+\[
+  \post_n = \Prob(y_n=1\mid x_n) = \sigm(w^\top\phi_n), \qquad \sigm(a)=\frac{1}{1+e^{-a}} .
+\]
+For independent labels $y_n\in\{0,1\}$ the likelihood is
+$\prod_{n=1}^N \post_n^{\,y_n}(1-\post_n)^{1-y_n}$, and its negative logarithm is the
+cross-entropy
+\begin{equation}
+  E(w) = -\sum_{n=1}^N \Big[\,y_n\log \post_n + (1-y_n)\log(1-\post_n)\Big]
+       = \sum_{n=1}^N \Big[\log\big(1+e^{a_n}\big) - y_n a_n\Big], \qquad a_n=w^\top\phi_n .
+  \label{eq:t3-ce}
+\end{equation}
+The second form uses $\log\sigm(a)=a-\log(1+e^{a})$ and $\log(1-\sigm(a))=-\log(1+e^{a})$.
+Maximum likelihood is minimising $E$.
+
+\paragraph{Gradient and Hessian.}
+Since $\frac{d}{da}\log(1+e^{a})=\sigm(a)$ and $\sigm'(a)=\sigm(a)(1-\sigm(a))$, differentiating
+\eqref{eq:t3-ce} with $\partial a_n/\partial w=\phi_n$ gives
+\begin{equation}
+  \nabla E(w) = \sum_{n} (\post_n - y_n)\,\phi_n = \Phi^\top(\post-y), \qquad
+  H(w) = \nabla^2E(w) = \sum_n \post_n(1-\post_n)\,\phi_n\phi_n^\top = \Phi^\top R\,\Phi ,
+  \label{eq:t3-grad}
+\end{equation}
+where $\Phi$ is the $N\times(d+1)$ matrix with rows $\phi_n^\top$, $\post$ and $y$ are the vectors of
+$\post_n$ and $y_n$, and $R=\operatorname{diag}\big(\post_n(1-\post_n)\big)$.
+
+\paragraph{Convexity.}
+For any $v$, $v^\top H v = \sum_n \post_n(1-\post_n)\,(v^\top\phi_n)^2 \ge 0$, so $H$ is positive
+semidefinite and $E$ is convex: every stationary point is a global minimum. Because
+$\post_n(1-\post_n)>0$ for finite $w$, $v^\top Hv=0$ forces $\Phi v=0$. Hence $E$ is strictly convex,
+and its minimiser unique if it exists, whenever $\Phi$ has full column rank.
+
+\paragraph{IRLS.}
+Newton's method updates $w^{\mathrm{new}} = w - H^{-1}\nabla E$. Substituting
+\eqref{eq:t3-grad} and writing $H w=\Phi^\top R\Phi w$,
+\begin{equation}
+  w^{\mathrm{new}} = (\Phi^\top R\Phi)^{-1}\Phi^\top R\,z, \qquad
+  z = \Phi w - R^{-1}(\post-y),
+  \label{eq:t3-irls}
+\end{equation}
+with $R$ and $\post$ evaluated at the current $w$. Each step is therefore a \emph{weighted least-squares}
+fit of the working response $z$, with weights $\post_n(1-\post_n)$ that change from step to step:
+iteratively reweighted least squares. Since $E$ is convex, the method converges to the global
+minimiser when one exists. In code the linear system is solved (e.g.\ by Cholesky), never by
+forming the inverse.
+
+\paragraph{Separable data and the L2 penalty.}
+Suppose the training set is linearly separable: some $\bar w$ has $\bar w^\top\phi_n>0$ for every
+spam email and $\bar w^\top\phi_n<0$ for every real one. Using the second form of
+\eqref{eq:t3-ce}, every term of $E(\kappa\bar w)$ equals $\log\big(1+e^{-\kappa|\bar w^\top\phi_n|}\big)$.
+So $E(\kappa\bar w)\to0$ as $\kappa\to\infty$. But $E(w)>0$ for every finite $w$, so the infimum
+$0$ is not attained and \emph{no maximum-likelihood estimate exists}. IRLS and gradient descent
+drive $\lVert w\rVert\to\infty$, and the fitted probabilities collapse to $0$ and $1$. For our
+problem this is worse than it is for accuracy: with every $\post$ at $0$ or $1$, every email falls
+below $\thz$ or above $\tho$, so the filter never inspects. Its probabilities are also maximally
+overconfident on new emails. Spambase has 57 sparse features and $2{,}761$ training emails, so
+complete or near separation is a real risk.
+
+The remedy is an L2 penalty on the weights. With $D=\operatorname{diag}(0,1,\dots,1)$, which
+leaves the bias unpenalised, we minimise
+\begin{equation}
+  E_\lambda(w) = E(w) + \tfrac{\lambda}{2}\, w^\top D\, w, \qquad \lambda>0 .
+  \label{eq:t3-l2}
+\end{equation}
+The gradient gains $\lambda Dw$ and the Hessian gains $\lambda D$. Now
+$v^\top(H+\lambda D)v = \sum_n \post_n(1-\post_n)(v^\top\phi_n)^2 + \lambda\sum_{j\ge1}v_j^2$. The last sum
+vanishes only if $v=(v_0,0,\dots,0)$, and then the first sum is $v_0^2\sum_n\post_n(1-\post_n)>0$. So
+$E_\lambda$ is strictly convex for any data. It also tends to infinity in every direction (the penalty
+controls the weights; with both classes present, the cross-entropy controls the bias), so a unique
+finite minimiser always exists. The IRLS step becomes
+\[
+  w^{\mathrm{new}} = w-(H+\lambda D)^{-1}\big(\Phi^\top(\post-y)+\lambda Dw\big)
+  = (\Phi^\top R\Phi+\lambda D)^{-1}\Phi^\top R\,z ,
+\]
+with the same $z$ as in \eqref{eq:t3-irls}. The strength $\lambda$ is chosen on the validation
+part.
+
+\begin{assumptions}
+Labels independent given the inputs; the log-odds is linear in $\phi$ (in the inputs as
+preprocessed). Strict convexity without a penalty needs $\Phi$ of full column rank; existence of the
+unpenalised estimate needs non-separable data; existence of the penalised one needs only $\lambda>0$
+and both classes present.
+\end{assumptions}
+
+%------------------------------------------------------------------------------
+\subsection{Threshold rules and their expected cost (T3)}
+\label{sec:t3-cost}
+% Member 3
+
+\paragraph{Accuracy-based decisions are the Bayes rule for 0--1 loss.}
+Under 0--1 loss, with costs $\cfp=\cfn=1$ and no inspection, the posterior expected losses are
+$R(1\mid x)=1-\post(x)$ for the spam folder and $R(0\mid x)=\post(x)$ for delivery. The Bayes
+action sends an email to spam iff $1-\post(x)\le\post(x)$, that is iff $\post(x)\ge\tfrac12$. The
+expected 0--1 loss of any rule is its error rate, $1-\text{accuracy}$, and choosing the
+best action for every $x$ minimises its expectation. So the threshold $\tfrac12$
+maximises accuracy among all two-action rules. This is the special case $\cfp=\cfn$ of the
+two-action threshold $\tstar=\cfp/(\cfp+\cfn)$ of Section~\ref{sec:decision}.
+
+\paragraph{Expected cost of a threshold rule.}
+Let a classifier output a score $s(x)\in[0,1]$, not necessarily a calibrated probability, and
+consider the rule ``deliver if $s\le t_0$, spam folder if $s\ge t_1$, inspect in between''
+($t_0\le t_1$; $t_0=t_1=t$ gives a two-action rule). Its behaviour is summarised by the class-conditional rates
+\[
+  \mathrm{FPR}=\Prob(a=1\mid y=0), \quad \mathrm{FNR}=\Prob(a=0\mid y=1), \quad
+  \rej_k=\Prob(a=r\mid y=k),
+\]
+and the overall rejection rate $\rej=\piz\rej_0+\pio\rej_1$. Conditioning on the true label and
+reading the loss matrix row by row,
+\begin{align}
+  R(t_0,t_1) = \E\big[L(a,y)\big]
+  &= \piz\,\E[L(a,0)\mid y=0] + \pio\,\E[L(a,1)\mid y=1] \notag\\
+  &= \piz\big[\cfp\,\mathrm{FPR} + \ci\,\rej_0\big] + \pio\big[\cfn\,\mathrm{FNR} + \ci\,\rej_1\big] \notag\\
+  &= \cfp\,\piz\,\mathrm{FPR} + \cfn\,\pio\,\mathrm{FNR} + \ci\,\rej .
+  \label{eq:t3-cost}
+\end{align}
+For a two-action rule $\rej=0$ and only the first two terms remain.
+Formula~\eqref{eq:t3-cost} holds for any score and any thresholds, because it uses only the confusion
+rates. Its empirical version (rates measured on test data, $\pi_k$ the test proportions) is exactly
+the average realized loss computed by \texttt{metrics.realized\_loss}. It also shows how the class
+prior enters: a rule tuned at one $\pio$ is weighed differently at another (Section~\ref{sec:prior-shift}).
+
+\begin{assumptions}
+Zero loss for correct decisions, constant $\ci$, perfect inspector (Section~\ref{sec:decision});
+the rates are taken under the same distribution as the one the cost is computed for.
+\end{assumptions}
+
+\paragraph{The threshold $\tfrac12$ is suboptimal when $\cfp\ne\cfn$.}
+
+\begin{proposition}\label{prop:t3-half}
+Let $\post(x)$ be the true posterior and compare the two-action rules ``spam iff $\post\ge t$''
+for $t=\tfrac12$ and $t=\tstar$. Then
+\[
+  R(\tfrac12) - R(\tstar) = (\cfp+\cfn)\;\E\Big[\,\big|\post(x)-\tstar\big|\;
+     \mathbf 1\{\post(x) \text{ lies between } \tfrac12 \text{ and } \tstar\}\Big] \;\ge\; 0,
+\]
+where ``between'' includes the endpoint $\tfrac12$ and excludes $\tstar$. The gap is strictly positive whenever
+$\cfp\neq\cfn$ and $\post(x)$ falls strictly between $\tfrac12$ and $\tstar$ with positive probability.
+\end{proposition}
+
+\begin{proof}
+For a two-action rule $\delta$, $R(\delta)=\E[\ell_\delta(x)]$ with $\ell_\delta(x)=\cfn\post(x)$ if
+$\delta$ delivers and $\cfp(1-\post(x))$ if it sends to spam. The two rules act differently only on the set
+$A$ where $\post(x)$ lies between $\tfrac12$ and $\tstar$. Take $\cfp>\cfn$, so $\tstar>\tfrac12$ and
+$A=\{\tfrac12\le\post<\tstar\}$. On $A$ the rule with $t=\tfrac12$ sends to spam and the rule with $t=\tstar$
+delivers, and
+\[
+  \cfp(1-\post)-\cfn\post = \cfp-(\cfp+\cfn)\post = (\cfp+\cfn)(\tstar-\post) > 0 .
+\]
+Taking expectations over $A$ gives the formula. The case $\cfp<\cfn$ is symmetric, with
+$A=\{\tstar\le\post<\tfrac12\}$ and integrand $(\cfp+\cfn)(\post-\tstar)$. If $\cfp=\cfn$ then $A$ is empty.
+\end{proof}
+
+So with our costs ($\cfp=10$, $\cfn=1$, $\tstar=10/11\approx0.909$) the accuracy rule pays an excess
+of $11(\tstar-\post)$ for every real-looking email with $\tfrac12\le\post<\tstar$ that it sends to
+spam. In the analytic model of Section~\ref{sec:t6} ($\mu=1$, $\pio=0.4$) the formula gives a gap of
+$0.461$ per email. This matches the difference between the two two-action rules in
+Table~\ref{tab:t6} ($0.772-0.311$) to every printed digit. Since $\tstar$ minimises $\ell_\delta(x)$
+for every $x$, it is optimal among \emph{all} two-action rules, not only these two.
+
+\paragraph{The Task 1 thresholds need calibrated probabilities.}
+A classifier is \emph{calibrated} if $q(s) = \Prob(y=1\mid s(x)=s)$ equals $s$. The argument above
+used the true posterior. A rule that sees $x$ only through the score $s$ can do no better than
+the posterior given the score, $q(s)$.
+
+\begin{proposition}\label{prop:t3-calib}
+Among rules that act on $s(x)$, the minimum expected cost is attained by applying the Task 1 rule to
+$q(s)$: deliver if $q(s)\le\thz$, spam if $q(s)\ge\tho$, inspect in between (two-action: spam iff
+$q(s)\ge\tstar$). Consequently:
+\begin{enumerate}[label=(\roman*),itemsep=1pt]
+  \item if the classifier is calibrated, the thresholds $\thz,\tho,\tstar$ applied to $s$ itself are optimal;
+  \item if $q$ is continuous and strictly increasing but $q\neq\mathrm{id}$, the optimal two-action
+        threshold on $s$ is $q^{-1}(\tstar)$, which differs from $\tstar$ unless $q(\tstar)=\tstar$;
+  \item thresholding $s$ at $\tstar$ is optimal for \emph{every} cost ratio $\cfp/\cfn$ if and only if
+        $q(t)=t$ for all $t\in(0,1)$, i.e.\ the scores are calibrated.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+By the tower property, $\E[L(a,y)] = \E\big[\E[L(a,y)\mid s]\big]$, and for a rule acting on $s$ the inner
+expectation is $\cfn q(s)$, $\cfp(1-q(s))$ or $\ci$ for the three actions. This is the posterior expected
+loss of Section~\ref{sec:decision} with $\post$ replaced by $q(s)$, so it is minimised by the Task 1 rule
+applied to $q(s)$. (i) is the case $q(s)=s$. For (ii), $q(s)\ge\tstar\iff s\ge q^{-1}(\tstar)$ since $q$ is
+strictly increasing. For (iii), as $\cfp/\cfn$ ranges over $(0,\infty)$, $\tstar$ ranges over $(0,1)$, so
+$q^{-1}(t)=t$ must hold for every $t$.
+\end{proof}
+
+For example, take an overconfident model that reports $s=\sigm(2a)$ when the true posterior is
+$\sigm(a)$; this is temperature $T=\tfrac12$. Then $q(s)=\sigm\big(\tfrac12\logit s\big)$, and the cost-optimal threshold on $s$ is
+$\sigm(2\logit\tstar)\approx0.990$, not $0.909$. Its accuracy at threshold $\tfrac12$ is unchanged,
+because $\sigm(2a)\ge\tfrac12\iff a\ge0$. Accuracy depends only on the sign of the log-odds, while the
+cost-optimal decision depends on its value. This is the effect Section~\ref{sec:calibration} measures.
+
+\begin{assumptions}
+Loss matrix of Section~\ref{sec:decision}; for (ii)--(iii), $q$ continuous and strictly increasing on the
+range of the scores.
+\end{assumptions}
+
+%------------------------------------------------------------------------------
+\subsection{Gaussian classifiers on Spambase (C2)}
+\label{sec:c2}
+% Member 3
+
+\paragraph{Implementation.}
+\texttt{models/gaussian.py} fits the maximum-likelihood priors, means and covariances (dividing by
+$n_k$), pools the covariances for the shared model, and applies the shrinkage rule of
+Section~\ref{sec:t2}, $S\mapsto(1-\alpha)S+\alpha\,\tfrac{\operatorname{tr}S}{d}I$. All
+densities are computed in the log domain from Cholesky factors $S=LL^\top$. The Mahalanobis term is
+$\lVert L^{-1}(x-\mu)\rVert^2$ via a triangular solve, and $\log|S|=2\sum_i\log L_{ii}$. No matrix is
+inverted. The posterior $\sigm(a(x))$ comes from the log-odds, and \texttt{predict\_log\_proba}
+normalises with log-sum-exp, so points far from both means give finite answers. The shrinkage
+strength $\alpha$ is chosen per split from a grid between $0$ and $1$ by \emph{validation log-loss}.
+Log-loss is a proper scoring rule (Section~\ref{sec:calibration}), so this picks the $\alpha$ that gives
+the best probabilities, which is what the cost-sensitive decisions use.
+
+\paragraph{Checks.}
+Unit tests (\texttt{tests/test\_gaussian.py}) confirm the following. On $60{,}000$ synthetic points in
+three dimensions, the fitted posteriors match the true posteriors (mean absolute error below
+$0.005$) for both models. The shared model agrees with scikit-learn's LDA to $10^{-8}$. Given the
+same parameters, the class-specific model agrees with scikit-learn's QDA to $10^{-6}$. The log-densities
+agree with SciPy's. For the shared model the log-odds is exactly linear, $a(x)=w^\top x+b$. A constant
+feature makes the unregularised fit fail and any $\alpha>0$ repair it.
+
+\paragraph{Does $\log(1+x)$ help?}
+Spambase features are non-negative, heavily skewed and mostly zero, far from Gaussian. Within a class
+some features barely vary, so without shrinkage the covariances are singular. Table~\ref{tab:c2} and
+Figure~\ref{fig:c2} compare plain standardisation with $\log(1+x)$ followed by standardisation over the
+20 splits. The transform helps both models clearly. For the shared model, test log-loss falls from
+$0.305$ to $0.223$ and the realized loss of the Bayes rule ($\cfp=10$, $\cfn=1$, $\ci=0.3$) from
+$0.172$ to $0.143$. Paired over splits, the improvements are $0.082\pm0.003$ and $0.029\pm0.004$. The
+class-specific model gains more ($0.265\pm0.029$ in log-loss) but remains far worse than the shared one
+with either preprocessing. Each class needs its own $57\times57$ covariance. Validation picks heavy
+shrinkage ($\alpha\approx0.9$), so the model is close to a diagonal one and its extra flexibility does
+not pay off on $2{,}761$ training emails. We therefore use the shared-covariance model with $\log(1+x)$
+features in the later sections.
+
+\begin{table}[ht]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\input{\resultsdir/c2_gaussian_summary.tex}
+\caption{Gaussian classifiers on Spambase: test-set mean $\pm$ standard error over 20 splits. Features are standardised, after $\log(1+x)$ in the last two rows.
+$\alpha$ is the shrinkage chosen on validation log-loss (median over splits). Accuracy uses
+threshold $\tfrac12$. ``Loss $\tstar$'' is the realized loss of the two-action rule at
+$\tstar=10/11$, ``Loss Bayes'' that of the three-action rule with $\ci=0.3$.
+Generated by \texttt{experiments/c2\_gaussian.py}.}
+\label{tab:c2}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{c2_gaussian_log1p.pdf}
+\caption{Test log-loss and realized loss of the Gaussian classifiers on Spambase, with and without
+the $\log(1+x)$ transform (mean $\pm$ standard error over 20 splits).}
+\label{fig:c2}
+\end{figure}

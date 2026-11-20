@@ -1,0 +1,10 @@
+\begin{tabular}{llrrrrrr}
+\toprule
+Features & Model & $\alpha$ & Log-loss & Brier & Accuracy & Loss $t^\ast$ & Loss Bayes \\
+\midrule
+raw & shared & 0.1 & 0.305 $\pm$ 0.006 & 0.087 $\pm$ 0.001 & 0.882 $\pm$ 0.002 & 0.293 $\pm$ 0.006 & 0.172 $\pm$ 0.005 \\
+raw & class-specific & 0.9 & 0.619 $\pm$ 0.029 & 0.171 $\pm$ 0.008 & 0.752 $\pm$ 0.011 & 0.623 $\pm$ 0.061 & 0.337 $\pm$ 0.020 \\
+$\log(1+x)$ & shared & 0.01 & 0.223 $\pm$ 0.006 & 0.060 $\pm$ 0.001 & 0.923 $\pm$ 0.002 & 0.214 $\pm$ 0.007 & 0.143 $\pm$ 0.006 \\
+$\log(1+x)$ & class-specific & 0.9 & 0.354 $\pm$ 0.010 & 0.077 $\pm$ 0.002 & 0.905 $\pm$ 0.002 & 0.360 $\pm$ 0.013 & 0.279 $\pm$ 0.010 \\
+\bottomrule
+\end{tabular}
