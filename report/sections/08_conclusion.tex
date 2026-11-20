@@ -1,13 +1,10 @@
-% TODO (All members): replace this placeholder.
 \section{Conclusion}
 \label{sec:conclusion}
-\emph{To be written by All members.}
-
-\paragraph{Probabilities and prior shift (Member 5).}
-Accuracy only checks which side of $0.5$ a probability falls on, but a cost-sensitive filter acts on the
-value of the probability. On Spambase, scaling the logistic model's log-odds left its accuracy unchanged at
-$93.6\%$ yet raised its cost by a third. Accuracy did not notice, but log-loss and ECE did.
-Calibration should therefore be checked before deploying a model, and Platt scaling on validation data is
-a cheap repair. When the spam rate changes but spam looks the same, one constant shift of the log-odds
-restores the Bayes rule. For logistic regression this is an intercept change, and for the Gaussian model it
-is a change of priors. The shift is only as good as the calibration underneath it.
+% Other members' paragraphs belong alongside this contribution.
+\paragraph{Calibration and inspection.}
+Forecast confidence changes the price of a routing decision even when the spam label stays
+fixed. In the example in Section~\ref{sec:calibration}, moving the higher forecast above
+the spam-folder threshold raises cost from $0.25$ to $1.10$ per email. In the Spambase
+experiment, inspecting roughly one in four emails at price $0.3$ reduced realized loss for
+both fitted models. The appropriate comparison depends on the cost of an error, the price of
+review, and how much probability mass actually enters the inspection band.

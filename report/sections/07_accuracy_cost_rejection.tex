@@ -220,8 +220,67 @@ $\Rstar$ equals $\rej$.
 
 \subsection{Experiments (C6)}
 \label{sec:c6}
-% TODO (Member 4): accuracy-vs-cost exhibit on Spambase and synthetic data,
-% realized cost and rejection rate vs c_I with error bands for both models,
-% overlay of the analytic curves (project4.analytic.GaussianModel1D.curves_vs_c_insp)
-% on the synthetic results, and when inspection beats the best two-action rule.
-\emph{To be written by Member 4.}
+For split $s=0,\ldots,19$ we drew $10{,}000$ Gaussian messages ($\mu=1$, $\pio=0.4$,
+seed $10{,}000+s$) and split the Spambase corpus using the same stratified $60/20/20$ protocol.
+We standardized features and fitted models on training data. Validation log-loss selected
+the shared-covariance Gaussian shrinkage from the team's grid and the logistic penalty from
+$0.01,0.1,1,10,100$. Each fitted model used identical test predictions across rules and prices.
+Tables and bands give means and one standard error over splits. Overlapping Spambase test sets
+make these bands descriptive of split variability.
+
+\begin{table}[htbp]
+\centering\small
+\input{\resultsdir/c6_rules.tex}
+\caption{Two automatic rules on held-out messages. Accuracy is the fraction of all test
+messages classified correctly. Cost is realized loss per message at $\cfp=10,\cfn=1$.}
+\label{tab:c6-rules}
+\end{table}
+
+On synthetic data, changing the Gaussian rule from $0.5$ to $10/11$ lowered accuracy
+from $84.6\%$ to $73.9\%$ and more than halved its cost (Table~\ref{tab:c6-rules}).
+At ten times the price of a missed spam email, avoiding one false positive pays for up to
+ten extra false negatives. Both fitted models show the same accuracy--cost ordering
+on Spambase.
+
+\begin{table}[htbp]
+\centering\small
+\input{\resultsdir/c6_savings.tex}
+\caption{Inspection at $\ci=0.3$. The two-action baseline uses each fitted posterior at
+$\tstar=10/11$. Costs and paired savings are per email. The last column is the fraction inspected.}
+\label{tab:c6-savings}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\linewidth]{c6_inspection_synthetic.pdf}
+\caption{Synthetic held-out results against the exact risk and rejection rate for the
+true Gaussian posterior. Narrow bands and overlapping lines reflect close agreement.
+The vertical line marks $\cstar=10/11$.}
+\label{fig:c6-synthetic}
+\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\linewidth]{c6_inspection_spambase.pdf}
+\caption{Spambase held-out cost and inspection rate. At and above the marked cutoff both
+models take only automatic actions, so each cost curve levels off at its own baseline.}
+\label{fig:c6-spambase}
+\end{figure}
+
+At $\ci=0.3$ theory predicts cost $0.179$ and rejection $0.416$. The fitted Gaussian
+gives $0.181$ and $0.417$ (Figure~\ref{fig:c6-synthetic}). On Spambase the logistic fit
+saves $0.100$ per email while inspecting $24.1\%$ (Figure~\ref{fig:c6-spambase} and Table~\ref{tab:c6-savings}).
+At zero price, both models inspected every test email on both datasets, with zero realized
+cost in every split. A finite fitted log-odds score implies a probability strictly between
+zero and one. Comparing scores directly with the log-odds thresholds preserves this fact
+even for forecasts that would round to an endpoint in probability space.
+
+For a true posterior the gain over the best two-action rule is
+$\Rtwo-\Rstar(\ci)=\E[(m(X)-\ci)_+]$, where $u_+=\max(u,0)$.
+It is strictly positive exactly when $\Prob(m(X)>\ci)>0$. Every nonempty inspection
+band has positive probability in the Gaussian model. On Spambase the true posterior is unknown,
+so the table compares the fitted policies on observed labels.
+
+\paragraph{Sensitivity to repeated feature vectors.}
+About $9.8\%$ of Spambase test rows had an exact 57-feature match in their training split.
+Excluding those rows preserved the conclusion: inspection reduced logistic cost from
+$0.264$ to $0.160$ and Gaussian cost from $0.291$ to $0.173$ per email.
