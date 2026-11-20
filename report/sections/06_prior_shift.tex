@@ -29,7 +29,7 @@ the log posterior odds of the lectures,
   \post'(x) = \sigm\big(\logit\post(x) + \lshift\big),
   \label{eq:t5-shift}
 \end{equation}
-the same shift for every email.
+so the log-odds of every email move by the same amount $\lshift$.
 
 \emph{Example.} Trained at $\pio=0.5$ and deployed at $\pion=0.1$, all odds are divided by $9$. An email
 with $\post=0.98$ (odds $49$) gets $\post'\approx0.845$, so with the thresholds $\thz=0.3$, $\tho=0.97$ of

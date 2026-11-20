@@ -107,13 +107,15 @@ posterior; ``+ Platt'' rows are re-calibrated on the validation part.}
 \end{table}
 
 \paragraph{Results.}
-On synthetic data both models match the true posterior (log-loss $0.433$ against $0.432$, Brier $0.139$)
-and their reliability curves lie on the diagonal (Figure~\ref{fig:c4-rel}, top). Even the true posterior has
+On the synthetic data both models perform as well as the true posterior (log-loss $0.433$ compared with
+$0.432$, and a Brier score of $0.139$ for all three), and their reliability curves lie on the diagonal (Figure~\ref{fig:c4-rel}, top). Even the true posterior has
 $\widehat{\mathrm{ECE}}\approx0.03$: with only $919$ test emails per split, the spam fraction in each bin is
-noisy, so ECE is never exactly $0$. On
-Spambase logistic regression is better on every score (log-loss $0.185$ against $0.224$, Brier $0.050$
-against $0.061$, ECE $0.021$ against $0.039$) and cheaper ($0.124$ against $0.142$ per email), although the
-accuracies differ by only $1.3$ points. The Gaussian model underpredicts spam for $q$ between $0.3$ and $0.6$
+noisy, so ECE is never exactly $0$.
+
+On Spambase, logistic regression gives better forecasts than the Gaussian model on all three scores: its
+log-loss is $0.185$ (Gaussian $0.224$), its Brier score $0.050$ ($0.061$) and its ECE $0.021$ ($0.039$). It is
+also cheaper, at $0.124$ per email compared with $0.142$, although the two accuracies differ by only $1.3$
+points. The Gaussian model underpredicts spam for $q$ between $0.3$ and $0.6$
 (emails given $0.45$ are spam $65\%$ of the time), right where $\thz=0.3$ lies, because word counts are far
 from Gaussian even after $\log(1+x)$.
 
@@ -121,18 +123,18 @@ from Gaussian even after $\log(1+x)$.
 \centering
 \includegraphics[width=0.85\linewidth]{c4_reliability.pdf}
 \caption{Reliability diagrams, using the test parts of all 20 splits together. Points above the diagonal mean the model
-underpredicts spam. Histograms: forecasts per equal-width bin (log scale).}
+underpredicts spam. The histograms show how many forecasts fall in each bin (log scale).}
 \label{fig:c4-rel}
 \end{figure}
 
 \paragraph{Same accuracy, different cost.}
-We repeat the example of the previous subsection on Spambase by rescaling the fitted logistic model,
+To test the example of the previous subsection on real data, we rescale the fitted logistic model on Spambase,
 $q_T=\sigm(\logit q/T)$. Dividing the log-odds by $T>0$ keeps every email on the same side of $0.5$, so
 the accuracy stays $0.936$ for every $T$ (Figure~\ref{fig:c4-temp}). The Bayes rule compares $q_T$ with
 $0.3$ and $0.97$, so its decisions do change. At $T=0.4$ more emails pass $0.97$, real emails sent to spam rise
 from $3.8$ to $10.5$ per split, and the cost rises by a third ($0.124\to0.164$). At $T=2.5$, $46\%$ of the
-emails are inspected (cost $0.149$). Log-loss detects both changes ($0.289$ and $0.249$ against $0.185$); the
-Brier score barely notices over-confidence ($0.053$ against $0.050$). The cost is lowest slightly above $T=1$
+emails are inspected (cost $0.149$). Log-loss detects both changes ($0.289$ and $0.249$, compared with $0.185$ at $T=1$), whereas the
+Brier score barely notices the over-confidence ($0.053$ compared with $0.050$). The cost is lowest slightly above $T=1$
 ($0.117$ at $T\approx1.2$), so a slightly less confident model would be a little cheaper.
 
 \begin{figure}[ht]
