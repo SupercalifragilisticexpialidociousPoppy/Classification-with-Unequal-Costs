@@ -81,22 +81,6 @@ $\tau_{\mathrm{acc}}$ has strictly higher accuracy \emph{and} strictly higher co
 accuracy-optimal rule is more accurate but more expensive than the cost-optimal rule.
 \end{proposition}
 
-\begin{proof}
-Using \eqref{eq:t6-post},
-\[
-  \mathrm{Acc}'(\tau) = \piz\phi(\tau+\mu)\big[1 - e^{2\mu\tau+\lambda}\big], \qquad
-  R'(\tau) = \piz\phi(\tau+\mu)\big[\cfn e^{2\mu\tau+\lambda} - \cfp\big].
-\]
-The factor $\piz\phi(\tau+\mu)$ is positive and $e^{2\mu\tau+\lambda}$ is strictly increasing. So
-$\mathrm{Acc}$ strictly increases up to the root $e^{2\mu\tau+\lambda}=1$ (posterior $\tfrac12$,
-$\tau=\tau_{\mathrm{acc}}$) and strictly decreases after it. Likewise $R$ strictly decreases up to
-$e^{2\mu\tau+\lambda}=\cfp/\cfn$ (posterior $\tstar$, $\tau=\tau_c$) and strictly increases after it.
-If $\cfp\ne\cfn$ then $\tstar\ne\tfrac12$ and, as $x_t$ is strictly increasing, $\tau_c\ne\tau_{\mathrm{acc}}$.
-Suppose $\cfp>\cfn$, so $\tau_{\mathrm{acc}}<\tau_c$. On $[\tau_{\mathrm{acc}},\tau_c]$, $\mathrm{Acc}$ is
-strictly decreasing and $R$ is strictly decreasing, so moving from $\tau$ towards $\tau_c$ lowers both.
-The case $\cfp<\cfn$ is symmetric.
-\end{proof}
-
 So between the two optima, accuracy and cost always rank rules in \emph{opposite} order: picking
 the more accurate of two rules always picks the more expensive one. With $\mu=1$, $\pio=0.4$,
 $\cfp=10$, $\cfn=1$ and $\ci=0.3$, Table~\ref{tab:t6} gives the numbers. The accuracy rule is the
@@ -140,10 +124,6 @@ $\cstar = \cfp\cfn/(\cfp+\cfn)$.
 \begin{lemma}\label{lem:mmax}
 $m(x)\le\cstar$ for every $x$, with equality iff $\post(x)=\tstar$.
 \end{lemma}
-\begin{proof}
-$\cfn p$ increases and $\cfp(1-p)$ decreases in $p$. Their minimum is therefore largest where
-they are equal, at $p=\cfp/(\cfp+\cfn)=\tstar$, where both equal $\cstar$.
-\end{proof}
 
 \begin{proposition}\label{prop:risk-ci}
 \begin{enumerate}[label=(\roman*),itemsep=1pt]
@@ -156,28 +136,6 @@ they are equal, at $p=\cfp/(\cfp+\cfn)=\tstar$, where both equal $\cstar$.
         positive iff $\ci<\cstar$, so allowing inspection improves the system iff $\ci<\cstar$.
 \end{enumerate}
 \end{proposition}
-
-\begin{proof}
-(i) For each fixed $x$, $c\mapsto\min\{m(x),c\}$ is the minimum of two non-decreasing affine
-functions of $c$, so it is non-decreasing and concave. Both properties survive taking the expectation.
-At $c=0$ the minimum is $0$ because $m\ge0$.
-
-(ii) For $h>0$,
-$\frac1h\big[\min\{m,c+h\}-\min\{m,c\}\big]$ lies in $[0,1]$ and tends to $\mathbf 1\{m>c\}$ as
-$h\downarrow0$. By dominated convergence the right derivative of $\Rstar$ is $\Prob(m>c)=\rej(c)$.
-The left derivative is, in the same way, $\Prob(m\ge c)$, and the two agree when $\Prob(m=c)=0$.
-In the Gaussian model $\post(x)$ is strictly monotone in $x$, so $\{x: m(x)=c\}$ has at most
-two points and probability zero. $\rej$ is non-increasing because $\{m>c'\}\subseteq\{m>c\}$ for
-$c'>c$. This is a second proof of concavity.
-
-(iii) By Lemma~\ref{lem:mmax}, $m(x)\le\cstar\le\ci$, so $\rej(\ci)=\Prob(m>\ci)=0$ and
-$\min\{m,\ci\}=m$, giving $\Rstar(\ci)=\E[m]=\Rtwo$.
-
-(iv) By (ii) and (iii), $\Rtwo-\Rstar(\ci)=\Rstar(\cstar)-\Rstar(\ci)=\int_{\ci}^{\cstar}\rej(s)\,ds$.
-In the Gaussian model $\post(x)$ takes every value in $(0,1)$. For $s<\cstar$ the set
-$\{x: m(x)>s\}=\{x:\thz(s)<\post(x)<\tho(s)\}$ is a non-empty open interval of $x$, so
-$\rej(s)>0$. The integral is therefore positive iff $\ci<\cstar$.
-\end{proof}
 
 Proposition~\ref{prop:risk-ci} says three things. First, the rejection rate is the marginal cost
 of inspection: raising $\ci$ by a small $\delta$ raises the Bayes risk by $\rej\,\delta$, because only the

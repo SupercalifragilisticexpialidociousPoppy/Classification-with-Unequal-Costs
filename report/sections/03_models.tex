@@ -162,67 +162,6 @@ and the gap is positive whenever some emails have $\tfrac12<\post<\tstar$.
 (If $\cfp<\cfn$ the roles of $\tfrac12$ and $\tstar$ swap; if $\cfp=\cfn$ the two rules coincide.)
 \end{proposition}
 
-\begin{proof}
-\emph{Step 1: the cost of a threshold rule is an average over emails.}
-Write $\delta_t$ for the rule ``spam iff $\post(x)\ge t$''. By the tower property,
-$R(t)=\E\big[L(\delta_t(x),y)\big]=\E_x\big[\,\E[L(\delta_t(x),y)\mid x]\,\big]$. Once the email $x$ is
-given, the action is fixed and the email is spam with probability $\post(x)$. So the inner expectation is
-the posterior expected loss of Section~\ref{sec:decision}:
-\[
-  \ell_t(x) \;=\; \E[L(\delta_t(x),y)\mid x] \;=\;
-  \begin{cases}
-    \cfn\,\post(x) & \text{if } \post(x)<t \quad\text{(deliver: lose $\cfn$ if it is spam)},\\
-    \cfp\,(1-\post(x)) & \text{if } \post(x)\ge t \quad\text{(spam folder: lose $\cfp$ if it is real)},
-  \end{cases}
-\]
-and $R(t)=\E_x[\ell_t(x)]$. By linearity of expectation,
-\begin{equation}
-  R(\tfrac12)-R(\tstar) \;=\; \E_x\big[\ell_{1/2}(x)-\ell_{\tstar}(x)\big],
-  \label{eq:t3-gap-avg}
-\end{equation}
-so it is enough to compare the two rules one email at a time.
-
-\emph{Step 2: where the two rules disagree.}
-Since $\cfp>\cfn$, the threshold $\tstar=\cfp/(\cfp+\cfn)$ is above $\tfrac12$. The two thresholds split the
-values of $\post$ into three ranges:
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
- & $\post<\tfrac12$ & $\tfrac12\le\post<\tstar$ & $\post\ge\tstar$ \\
-\midrule
-rule $t=\tfrac12$ & deliver & spam folder & spam folder \\
-rule $t=\tstar$   & deliver & deliver     & spam folder \\
-\bottomrule
-\end{tabular}
-\end{center}
-In the first and last ranges both rules take the same action, so $\ell_{1/2}(x)-\ell_{\tstar}(x)=0$.
-They disagree only on the set $A=\{x:\tfrac12\le\post(x)<\tstar\}$.
-
-\emph{Step 3: the extra cost on $A$.}
-For $x\in A$ the rule $t=\tfrac12$ sends the email to spam and the rule $t=\tstar$ delivers it, so by
-Step~1
-\[
-  \ell_{1/2}(x)-\ell_{\tstar}(x) \;=\; \cfp\,(1-\post) - \cfn\,\post .
-\]
-
-\emph{Step 4: simplify.} Expand the bracket, collect the two terms in $\post$, and use
-$\cfp=(\cfp+\cfn)\,\tstar$, which is the definition of $\tstar$ multiplied by $\cfp+\cfn$:
-\begin{align*}
-  \cfp(1-\post)-\cfn\post
-  &= \cfp - \cfp\post - \cfn\post
-   = \cfp - (\cfp+\cfn)\,\post \\
-  &= (\cfp+\cfn)\,\tstar - (\cfp+\cfn)\,\post
-   = (\cfp+\cfn)\,(\tstar-\post).
-\end{align*}
-
-\emph{Step 5: put the pieces together.} Steps 2--4 say that, for every email,
-\[
-  \ell_{1/2}(x)-\ell_{\tstar}(x) \;=\; (\cfp+\cfn)\,(\tstar-\post(x))\;\mathbf 1\{\tfrac12\le\post(x)<\tstar\},
-\]
-where the indicator $\mathbf 1\{\cdot\}$ is $1$ for emails in $A$ and $0$ for all others. Substituting this
-into \eqref{eq:t3-gap-avg} gives the formula of the proposition.
-\end{proof}
-
 \emph{In numbers.} With our costs ($\cfp=10$, $\cfn=1$, so $\cfp+\cfn=11$ and $\tstar=10/11\approx0.909$),
 every email with $0.5\le\post<0.909$ costs the accuracy rule an extra $11\,(0.909-\post)$. For example, an
 email with $\post=0.7$ costs $10\times0.3=3$ in the spam folder but only $1\times0.7=0.7$ if delivered, an
@@ -246,58 +185,6 @@ For rules that see an email only through its score $s$:
 \end{enumerate}
 \end{proposition}
 
-\begin{proof}
-\emph{Step 1: what a score-based rule is.} A rule that sees an email only through its score chooses an
-action $a(s)$ for each score value $s$. Its expected cost is $\E\big[L(a(s(x)),y)\big]$.
-
-\emph{Step 2: average in two stages.} By the tower property, first average over the label for a fixed
-score, then over the scores:
-\[
-  \E\big[L(a(s),y)\big] \;=\; \E_s\Big[\,\E\big[L(a(s),y)\,\big|\,s\big]\,\Big].
-\]
-
-\emph{Step 3: the inner average.} For a fixed score $s$ the action $a(s)$ is fixed, and by the definition
-of $q$ the email is spam with probability $q(s)$ and real with probability $1-q(s)$. Reading the loss
-matrix row by row,
-\[
-  \E\big[L(a,y)\,\big|\,s\big] \;=\; L(a,0)\,(1-q(s)) + L(a,1)\,q(s) \;=\;
-  \begin{cases}
-    \cfn\,q(s) & \text{deliver},\\
-    \cfp\,(1-q(s)) & \text{spam folder},\\
-    \ci & \text{inspect}.
-  \end{cases}
-\]
-
-\emph{Step 4: choose the best action score by score.} Let $a^\ast(s)$ be the action with the smallest of these
-three values. For any other rule $a(\cdot)$ and every score $s$, the inner average of $a$ is at least that of
-$a^\ast$. Averaging an inequality that holds for every $s$ keeps it, so no score-based rule has a lower expected
-cost than $a^\ast$. (This is the argument of Section~\ref{sec:decision}, with scores in place of emails.)
-
-\emph{Step 5: read off the thresholds, proving (i).} The three values in Step 3 are exactly the three expected
-losses of Section~\ref{sec:decision}, $\cfn\post$, $\cfp(1-\post)$ and $\ci$, with $\post$ replaced by $q(s)$.
-Comparing them is the same algebra, so the smallest is: deliver if $q(s)\le\thz=\ci/\cfn$, spam folder if
-$q(s)\ge\tho=1-\ci/\cfp$, inspect in between. Without inspection: spam folder iff $q(s)\ge\tstar$.
-
-\emph{Step 6: the calibrated case, proving (ii).} If the model is calibrated then $q(s)=s$ for every $s$.
-Substituting into Step 5, the best rule is: deliver if $s\le\thz$, spam if $s\ge\tho$, inspect in between.
-These are the Task 1 thresholds applied to the score itself.
-
-\emph{Step 7: the uncalibrated case, first part of (iii).} Let $q$ be continuous and strictly increasing.
-Then it has an inverse $q^{-1}$, which is also increasing, and applying an increasing function to both
-sides of an inequality keeps its direction:
-\[
-  q(s)\ge\tstar \iff s\ge q^{-1}(\tstar).
-\]
-So by Step 5 the best two-action rule on the score is ``spam iff $s\ge q^{-1}(\tstar)$''. This is the same as
-cutting at $\tstar$ only if $q^{-1}(\tstar)=\tstar$, i.e.\ $q(\tstar)=\tstar$.
-
-\emph{Step 8: every cost ratio, second part of (iii).} If the model is calibrated, $q^{-1}(t)=t$, so
-cutting at $\tstar$ is best whatever the costs. Conversely, suppose cutting at $\tstar$ is best for every
-cost ratio $r=\cfp/\cfn$. Then $q^{-1}(\tstar)=\tstar$ for every value $\tstar=r/(1+r)$ can take. As $r$
-runs from $0$ to $\infty$, $r/(1+r)$ runs through every number in $(0,1)$: any $t\in(0,1)$ is reached by
-$r=t/(1-t)$. Hence $q^{-1}(t)=t$, i.e.\ $q(t)=t$, for every $t\in(0,1)$: the model is calibrated.
-\end{proof}
-
 \emph{Worked example: an overconfident model.} Let $a(x)$ be an email's true log-odds, so its true
 probability of being spam is $\sigm(a)$. Suppose the model doubles the log-odds and reports
 $s=\sigm(2a)$, which is temperature scaling with $T=\tfrac12$.
@@ -307,7 +194,7 @@ $s=\sigm(2a)$, which is temperature scaling with $T=\tfrac12$.
   \item \emph{Accuracy does not change.} $s\ge\tfrac12\iff\logit s\ge0\iff 2a\ge0\iff a\ge0\iff\sigm(a)\ge\tfrac12$.
         The model puts every email on the correct side of $\tfrac12$, so its labels and accuracy are those of
         the true probabilities.
-  \item \emph{The right cut moves.} By Step 7, send to spam iff $q(s)\ge\tstar$, i.e.\
+  \item \emph{The right cut moves.} By Proposition~\ref{prop:t3-calib}(iii), send to spam iff $q(s)\ge\tstar$, i.e.\
         $\tfrac12\logit s\ge\logit\tstar$, i.e.\ $\logit s\ge2\logit\tstar$, i.e.\ $s\ge\sigm(2\logit\tstar)$.
   \item \emph{In numbers.} $\logit(10/11)=\log\frac{10/11}{1/11}=\log10$, so the cut is
         $\sigm(2\log10)=\dfrac{1}{1+e^{-2\log10}}=\dfrac{1}{1+1/100}=\dfrac{100}{101}\approx0.990$, not $0.909$.

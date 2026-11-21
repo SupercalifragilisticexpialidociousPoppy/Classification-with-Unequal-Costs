@@ -79,12 +79,6 @@ $\E\big[L(\delta(x),y)\big]$ is minimised by
   \delta^\ast(x) = \arg\min_{a\in\mathcal A} R(a\mid x).
 \]
 \end{proposition}
-\begin{proof}
-By the law of total expectation,
-$\E\big[L(\delta(x),y)\big] = \E_x\Big[\E\big[L(\delta(x),y)\mid x\big]\Big] = \E_x\big[R(\delta(x)\mid x)\big]$.
-For every $x$, $R(\delta(x)\mid x)\ge\min_a R(a\mid x) = R(\delta^\ast(x)\mid x)$. Taking expectations
-over $x$ preserves the inequality, so no rule has a smaller expected loss than $\delta^\ast$.
-\end{proof}
 
 Two consequences follow from \eqref{eq:cond-risk}. First, $R(a\mid x)$ depends on $x$ only through
 $\post(x)$, so the Bayes action is a function of the posterior alone. Second, each $R(a\mid x)$ is an
@@ -125,20 +119,6 @@ Let $\cstar = \dfrac{\cfp\,\cfn}{\cfp+\cfn}$.
         Bayes action is the single-threshold rule: spam folder iff $\post\ge\tstar$, deliver otherwise.
 \end{enumerate}
 \end{proposition}
-\begin{proof}
-Let $m(\post) = \min\{\cfn\post,\ \cfp(1-\post)\}$ be the loss of the better automatic action. The first
-term increases and the second decreases in $\post$; they meet at $\post=\tstar$, where both equal
-$\cfn\tstar = \cstar$. So $\max_{\post\in[0,1]} m(\post) = \cstar$.
-
-(b) If $\ci\ge\cstar$ then $m(\post)\le\cstar\le\ci$ for every $\post$, so inspecting never beats both
-automatic actions. The choice between them is the first comparison above.
-
-(a) If $\ci<\cstar$, divide by $\cfn$ and by $\cfp$: $\thz=\ci/\cfn<\cstar/\cfn=\tstar$ and
-$\tho=1-\ci/\cfp>1-\cstar/\cfp=\tstar$. For $\post\le\thz$ we also have $\post<\tstar$, so delivering
-beats both other actions. For $\post\ge\tho$ we have $\post>\tstar$, so the spam folder beats both.
-For $\thz<\post<\tho$, inspection beats delivering ($\cfn\post>\ci$) and the spam folder
-($\cfp(1-\post)>\ci$).
-\end{proof}
 
 The inspect band $(\thz,\tho)$ is non-empty exactly when
 \[
