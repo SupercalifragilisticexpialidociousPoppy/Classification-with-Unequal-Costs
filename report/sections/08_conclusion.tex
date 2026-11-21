@@ -1,6 +1,19 @@
 \section{Conclusion}
 \label{sec:conclusion}
 % Other members' paragraphs belong alongside this contribution.
+\paragraph{Decision rule and prior shift.}
+% Member 1
+The cost-minimising action depends on an email only through its posterior $\post$: with zero loss for
+correct decisions it delivers below $\thz=\ci/\cfn$, sends to spam above $\tho=1-\ci/\cfp$ and
+inspects in between, and inspection is worth offering only when $\ci<\cstar=\cfp\cfn/(\cfp+\cfn)$
+(Section~\ref{sec:decision}). With our costs the spam folder needs $97\%$ certainty, far from the
+$50\%$ of the accuracy rule. The same rule makes the filter sensitive to the share of spam it sees:
+when the Spambase share fell from $39\%$ to $5\%$, the uncorrected filter inspected and misfiled too much
+and cost two and a half times as much as the corrected one ($0.095$ against $0.038$ per email). The
+one-line odds correction works even when the new share is estimated from unlabelled emails
+(Section~\ref{sec:c5}). The correction cannot repair a model
+whose probabilities are wrong, so calibration comes first.
+
 \paragraph{Calibration and inspection.}
 Forecast confidence changes the price of a routing decision even when the spam label stays
 fixed. In the example in Section~\ref{sec:calibration}, moving the higher forecast above
