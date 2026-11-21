@@ -1,8 +1,10 @@
-\section{Can the probabilities be trusted? (Member 5)}
+\section{Can the probabilities be trusted? (Member~5)}
 \label{sec:calib}
 \textbf{Code:} \code{calibration.py}, \code{experiments/task3\_calibration.py}.
 
-Accuracy only asks whether $\post$ is on the right side of $0.5$. Our rule compares $\post$ with
+Section~\ref{sec:sweep} found logistic regression cheaper than the Gaussian models with every rule.
+To see why, we looked at the probabilities themselves. Accuracy only asks whether $\post$ is on the
+right side of $0.5$. Our rule compares $\post$ with
 $0.3$ and $0.97$, so it needs $\post$ to be \emph{calibrated}: of the emails given $\post=0.8$, about
 $80\%$ should be spam. \code{calibration.py} implements the log-loss, the Brier score, the expected
 calibration error (ECE: the average gap between forecast and observed spam rate over 10 bins),

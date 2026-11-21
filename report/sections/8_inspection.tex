@@ -4,11 +4,11 @@ The earlier sections kept finding that the most accurate filter is not the cheap
 measured that trade-off and the value of inspection, first exactly in a simple model and then on
 held-out data.
 
-\subsection{An exact model (Member 6)}
+\subsection{An exact model (Member~6)}
 \label{sec:t6}
 \textbf{Code:} \code{analytic.py}, \code{experiments/t6\_analytic.py}.
 
-To see the trade-offs without any fitting, \code{analytic.py} uses a one-dimensional model: real
+To see the trade-offs of Sections~\ref{sec:sweep}--\ref{sec:shift} without any fitting, \code{analytic.py} uses a one-dimensional model: real
 emails have a score $x\sim N(-1,1)$, spam has $x\sim N(+1,1)$, and $40\%$ of emails are spam. Here the
 accuracy, cost and inspection rate of any threshold rule have closed forms. Table~\ref{tab:t6}
 compares four rules.
@@ -47,11 +47,11 @@ without inspection. Dashed: $\cstar=10/11$, where inspection stops.}
 \label{fig:t6}
 \end{figure}
 
-\subsection{On held-out data (Member 4)}
+\subsection{On held-out data (Member~4)}
 \label{sec:c6}
 \textbf{Code:} \code{experiments/task5\_inspection.py}.
 
-We then checked these predictions with fitted models. For each of the 20 splits the experiment draws
+We then checked these predictions with the fitted models of Section~\ref{sec:models}. For each of the 20 splits the experiment draws
 $10{,}000$ emails from the one-dimensional model and uses the standard Spambase split (standardised
 features). It fits the shared Gaussian model and logistic regression, tuned on validation log-loss,
 and applies three rules to the same test probabilities: the accuracy cut $0.5$, the cost cut $10/11$,

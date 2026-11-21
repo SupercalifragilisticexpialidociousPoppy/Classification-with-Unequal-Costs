@@ -1,4 +1,4 @@
-\section{Setting up the experiments (Member 6)}
+\section{Setting up the experiments (Member~6)}
 \label{sec:setup}
 \textbf{Code:} \code{data.py}, \code{decision.py}, \code{metrics.py}, \code{config.py},
 \code{plotting.py}, \code{run\_all.py}.
@@ -24,4 +24,5 @@ exactly $0$ or $1$). A unit test compares it with a brute-force search over the 
 $10{,}000$ random posteriors and loss matrices. \code{metrics.py} computes the realized loss, accuracy,
 inspection rate and confusion matrices with an inspect column. \code{run\_all.py} regenerates every
 figure and table in this report in under a minute, and 101 unit tests cover the shared code and the
-models.
+models. With data, splits and scoring fixed, the first question was which action to take for an
+email once we know how likely it is to be spam.

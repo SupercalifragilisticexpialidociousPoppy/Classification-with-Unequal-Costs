@@ -1,8 +1,9 @@
-\section{Choosing the cheapest action (Member 1)}
+\section{Choosing the cheapest action (Member~1)}
 \label{sec:rule}
 \textbf{Code:} \code{experiments/t1\_expected\_loss.py}.
 
-Suppose a model tells us an email is spam with probability $\post$. Delivering it then costs
+Suppose a model tells us an email is spam with probability $\post$, and \code{decision.py} has to
+pick an action. Delivering it then costs
 $\cfn\post$ on average, filing it as spam costs $\cfp(1-\post)$, and inspecting it costs $\ci$
 whatever the email is. Figure~\ref{fig:t1} draws these three lines; the cheapest action is the lowest
 one. Reading off where the lines cross gives the rule
@@ -26,3 +27,6 @@ $\cstar=\cfp\cfn/(\cfp+\cfn)=10/11$. At $\ci=1$ it does not, and the rule falls 
 $\cfp=10$, $\cfn=1$. Shading marks where each action is cheapest. Left: $\ci=0.3$. Right: $\ci=1$.}
 \label{fig:t1}
 \end{figure}
+
+These thresholds are what every later experiment applies. They assume a probability for every
+email, so the next step was to build models that give one.

@@ -1,9 +1,10 @@
-\section{Accuracy rule or cost rule? (Member 2)}
+\section{Accuracy rule or cost rule? (Member~2)}
 \label{sec:sweep}
 \textbf{Code:} \code{experiments/task2\_cost\_sweep.py}.
 
-With both classifiers in place, the first question was how much the choice of rule matters as the
-two error costs move apart. The sweep varies the ratio $r=\cfp/\cfn$ from $1/20$ to $20$ (with
+With both classifiers of Section~\ref{sec:models} in place, we applied the rule of
+Section~\ref{sec:rule} to them and asked how much it beats the accuracy rule as the two error costs
+move apart. The sweep varies the ratio $r=\cfp/\cfn$ from $1/20$ to $20$ (with
 $\cfp=\sqrt r$, $\cfn=1/\sqrt r$ and $\ci=0.1$) and applies three rules to the same fitted
 probabilities: the accuracy rule (spam iff $\post\ge0.5$), the cost rule without inspection (spam iff
 $\post\ge\tstar$) and the full rule with inspection. It runs logistic regression and both Gaussian

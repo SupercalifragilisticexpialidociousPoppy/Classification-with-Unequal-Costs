@@ -3,7 +3,7 @@
 A filter trained where $39\%$ of emails are spam may be used where only $5\%$ are. Its probabilities
 then overstate spam, and the thresholds of Section~\ref{sec:rule} act on the wrong numbers.
 
-\subsection{Correcting the probabilities (Member 5)}
+\subsection{Correcting the probabilities (Member~5)}
 \label{sec:t5}
 \textbf{Code:} \code{prior\_shift.py}, \code{experiments/t5\_prior\_correction.py}.
 
@@ -26,16 +26,17 @@ the shaded band is the inspect region.}
 \label{fig:t5}
 \end{figure}
 
-\subsection{Testing the correction (Member 1)}
+\subsection{Testing the correction (Member~1)}
 \label{sec:c5}
 \textbf{Code:} \code{experiments/task4\_prior\_shift.py}.
 
-We tested the correction on data where only the spam rate changes, with $\cfp=10$, $\cfn=1$,
+We tested the correction on the two models of Section~\ref{sec:models}, using data where only the
+spam rate changes, with $\cfp=10$, $\cfn=1$,
 $\ci=0.3$. On synthetic data the models are trained at $\pio=0.5$ and tested on fresh samples at
 each deployment rate $\pion$ from $0.05$ to $0.8$. On Spambase (trained at $\pio=0.394$) the test part
 is resampled within each class to the new rate, for example $586$ emails of which $29$ are spam at
-$\pion=0.05$. Both the shared Gaussian model and logistic regression are used, and the decisions are
-made on four versions of $\post$: uncorrected, corrected with the true $\pion$, corrected with $\pion$
+$\pion=0.05$. Following Section~\ref{sec:gaussian}, the Gaussian model is the shared one with $\log(1+x)$
+features on Spambase. The decisions are made on four versions of $\post$: uncorrected, corrected with the true $\pion$, corrected with $\pion$
 estimated from the unlabelled test emails (an EM iteration that sets the rate to the average corrected
 probability until it stops changing), and
 (synthetic only) the true posterior.
