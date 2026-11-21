@@ -1,5 +1,13 @@
 \section{Code listing and contribution statement}
 \label{sec:contrib}
+\paragraph{Member 1.} Derived the T1 decision theory in Section~\ref{sec:decision} (loss matrix,
+Bayes action for a general loss matrix, reject thresholds, imperfect inspection, equal-cost check) with its
+figure, \path{project4/experiments/t1_expected_loss.py}, and wrote the introduction (Section~\ref{sec:intro}).
+Implemented the C5 prior-shift experiments in \path{project4/experiments/task4_prior_shift.py} with
+\path{tests/test_c5_prior_shift.py}, using the correction by Member 5, the classifiers by Members 2 and 3 and
+the shared infrastructure by Member 6. Section~\ref{sec:c5} reports the results. Reviewed Member 6's C1
+infrastructure against the T1 derivation.
+
 \paragraph{Member 4.} Derived the T4 scoring-rule proofs, calibration decomposition and
 temperature example in Section~\ref{sec:calibration}. Implemented the C6 held-out
 inspection experiment in \path{project4/experiments/task5_inspection.py}, using the Gaussian
@@ -56,3 +64,18 @@ with tests, using the classifiers by Members 2 and 3 and the infrastructure by M
   breaklines=true,
   breakindent=1em
 ]{../project4/prior_shift.py}
+
+\subsection{Member 1's prior-shift experiment}
+\lstinputlisting[
+  language=Python,
+  basicstyle=\footnotesize\ttfamily,
+  numbers=left,
+  numberstyle=\scriptsize,
+  numbersep=0.7em,
+  xleftmargin=2.5em,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true,
+  breakindent=1em
+]{../project4/experiments/task4_prior_shift.py}
