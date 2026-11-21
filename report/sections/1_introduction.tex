@@ -1,0 +1,39 @@
+\section{Introduction}
+\label{sec:intro}
+
+We built a spam filter that is judged by what its mistakes cost, not by how many it makes. For every
+email the filter takes one of three actions: deliver it to the inbox, send it to the spam folder, or
+hold it for a person to inspect. The two errors are very different. A spam in the inbox is a small
+nuisance. A real email in the spam folder may never be seen. We price them as follows:
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+Action & real email ($y=0$) & spam ($y=1$) \\
+\midrule
+deliver       & $0$           & $\cfn=1$ \\
+spam folder   & $\cfp=10$     & $0$ \\
+inspect       & $\ci=0.3$     & $\ci=0.3$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+If a model says an email is spam with probability $\post$, delivering it costs $\cfn\post$ on average,
+filing it as spam costs $\cfp(1-\post)$, and inspecting it costs $\ci$. The cheapest action is
+\[
+  \text{deliver if } \post\le\thz=\frac{\ci}{\cfn}=0.3,\qquad
+  \text{spam folder if } \post\ge\tho=1-\frac{\ci}{\cfp}=0.97,\qquad
+  \text{inspect in between.}
+\]
+Without inspection the rule is a single cut at $\tstar=\cfp/(\cfp+\cfn)=10/11\approx0.91$, not the
+$0.5$ that maximises accuracy. Inspection is worth offering only if it costs less than
+$\cstar=\cfp\cfn/(\cfp+\cfn)=10/11$. Everything we report is the \emph{realized loss}: the average
+of these costs over held-out emails.
+
+The rule is only as good as the probability $\post$ it is given, so most of the project is about
+getting good probabilities and checking what happens when they are wrong. Each section below covers
+the code one member wrote and what it showed. Member 6 built the shared pipeline that every
+experiment uses (Section~\ref{sec:m6}). Members 2 and 3 wrote the two classifiers, logistic
+regression and Gaussian models (Sections~\ref{sec:m2} and~\ref{sec:m3}). Member 5 wrote the
+calibration tools and the correction for a changed spam rate (Section~\ref{sec:m5}). Member 1 tested
+that correction (Section~\ref{sec:m1}), and Member 4 measured what inspection saves
+(Section~\ref{sec:m4}). All models are written from scratch in Python and NumPy.

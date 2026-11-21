@@ -1,38 +1,50 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs,graphicx}
+\usepackage[font=small,labelfont=bf]{caption}
 \usepackage[hidelinks]{hyperref}
 \usepackage{enumitem}
+\usepackage[section]{placeins}
+\setlist{itemsep=1pt,topsep=3pt}
 \input{notation}
-
-\newtheorem{proposition}{Proposition}
-\newtheorem{lemma}{Lemma}
-\theoremstyle{remark}
-\newtheorem*{assumptions}{Assumptions}
+\newcommand{\cFP}{c_{FP}}   % used inside the generated Task 2 tables
+\newcommand{\cFN}{c_{FN}}
 
 % Figures and tables come only from scripts (python -m project4.run_all).
 \graphicspath{{../project4/figures/}}
 \newcommand{\resultsdir}{../project4/results}
-
-\title{\textbf{MAC 312 -- Project 4}\\Classification with Unequal Error Costs and Rejection}
-\author{Member 1 \and Member 2 \and Member 3 \and Member 4 \and Member 5 \and Member 6}
-\date{\today}
+\newcommand{\code}[1]{\texttt{#1}}
+\emergencystretch=3em
 
 \begin{document}
-\maketitle
 
-\input{sections/01_intro_setup}        % M1, M6
-\input{sections/02_decision_theory}    % T1
-\input{sections/03_models}             % T2, T3
-\input{sections/04_task2_results}      % C3
-\input{sections/05_calibration}        % T4, C4
-\input{sections/06_prior_shift}        % T5, C5
-\input{sections/07_accuracy_cost_rejection} % T6, C6
-\input{sections/08_conclusion}         % one paragraph per member
+\begin{center}
+{\LARGE\bfseries MAC 312 -- Project 4}\\[4pt]
+{\Large Classification with Unequal Error Costs and Rejection}\\[10pt]
+\footnotesize
+\begin{tabular}{clll}
+\toprule
+& Name & ID No. & Code owned (in \code{project4/}) \\
+\midrule
+1 & Mohammad Zaid Agha        & 2024ADPS0840G & \code{t1\_expected\_loss.py}, \code{task4\_prior\_shift.py} \\
+2 & Nitin Sureshkumar         & 2024ADPS0881G & \code{models/logistic.py}, \code{task2\_cost\_sweep.py} \\
+3 & Tanishk Milind Tasgaonkar & 2024ADPS0874G & \code{models/gaussian.py}, \code{c2\_gaussian.py} \\
+4 & Saatwik Tiwari            & 2024ADPS0878G & \code{task5\_inspection.py} \\
+5 & Lakshya Satya             & 2024ADPS0828G & \code{calibration.py}, \code{prior\_shift.py}, \code{task3\_calibration.py} \\
+6 & Vismay V Shanbhag         & 2024ADPS0876  & \code{data.py}, \code{decision.py}, \code{metrics.py}, \code{analytic.py} \\
+\bottomrule
+\end{tabular}
+\end{center}
 
-\appendix
-\input{sections/A_contributions}
+\input{sections/1_introduction}
+\input{sections/2_member6}
+\input{sections/3_member2}
+\input{sections/4_member3}
+\input{sections/5_member5}
+\input{sections/6_member1}
+\input{sections/7_member4}
+\input{sections/8_conclusion}
 
 \bibliographystyle{plain}
 \bibliography{references}

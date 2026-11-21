@@ -1,0 +1,21 @@
+\begin{tabular}{llccc}
+\toprule
+Model & Rule & \multicolumn{3}{c}{$\cFP/\cFN$} \\
+\cmidrule(l){3-5}
+ & & 0.1 & 1 & 10 \\
+\midrule
+Logistic & accuracy ($t=0.5$) & 0.444{\scriptsize$\pm$0.007} & 0.195{\scriptsize$\pm$0.002} & 0.236{\scriptsize$\pm$0.007} \\
+ & Bayes, 2-action & 0.220{\scriptsize$\pm$0.003} & 0.195{\scriptsize$\pm$0.002} & 0.099{\scriptsize$\pm$0.001} \\
+ & Bayes + insp. & 0.098{\scriptsize$\pm$0.002} & 0.098{\scriptsize$\pm$0.001} & 0.071{\scriptsize$\pm$0.001} \\
+\midrule
+Gauss.\ shared & accuracy ($t=0.5$) & 0.468{\scriptsize$\pm$0.008} & 0.195{\scriptsize$\pm$0.002} & 0.208{\scriptsize$\pm$0.005} \\
+ & Bayes, 2-action & 0.227{\scriptsize$\pm$0.004} & 0.195{\scriptsize$\pm$0.002} & 0.098{\scriptsize$\pm$0.001} \\
+ & Bayes + insp. & 0.105{\scriptsize$\pm$0.003} & 0.099{\scriptsize$\pm$0.001} & 0.070{\scriptsize$\pm$0.000} \\
+\midrule
+Gauss.\ class-spec. & accuracy ($t=0.5$) & 0.409{\scriptsize$\pm$0.008} & 0.175{\scriptsize$\pm$0.002} & 0.199{\scriptsize$\pm$0.006} \\
+ & Bayes, 2-action & 0.160{\scriptsize$\pm$0.002} & 0.175{\scriptsize$\pm$0.002} & 0.083{\scriptsize$\pm$0.002} \\
+ & Bayes + insp. & 0.077{\scriptsize$\pm$0.001} & 0.075{\scriptsize$\pm$0.001} & 0.059{\scriptsize$\pm$0.001} \\
+\midrule
+Oracle & Bayes + insp. & 0.076{\scriptsize$\pm$0.001} & 0.075{\scriptsize$\pm$0.001} & 0.058{\scriptsize$\pm$0.001} \\
+\bottomrule
+\end{tabular}

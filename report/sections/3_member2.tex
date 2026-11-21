@@ -1,0 +1,81 @@
+\section{Member 2: logistic regression and the cost-ratio sweep}
+\label{sec:m2}
+\textbf{Code:} \code{models/logistic.py}, \code{experiments/task2\_cost\_sweep.py}.
+
+\paragraph{Logistic regression.}
+The model is $\post=\sigm(w^\top x+b)$, fitted by Newton's method (iteratively reweighted least
+squares) with an L2 penalty on $w$ and none on the intercept. It converges in a few iterations, and
+the penalty, chosen on validation log-loss from $10^{-2}$ to $10^{3}$, keeps the weights finite even
+when the classes are separable. The tests check that the gradient is zero at the solution, that the
+fit matches scikit-learn's, and that it recovers the true weights from a large simulated sample.
+
+\paragraph{The sweep.}
+Task 2 asks how much the choice of rule matters as the two error costs move apart. The script varies
+the ratio $r=\cfp/\cfn$ from $1/20$ to $20$ (with $\cfp=\sqrt r$, $\cfn=1/\sqrt r$ and $\ci=0.1$) and
+compares three rules on the same fitted probabilities: the accuracy rule (spam iff $\post\ge0.5$),
+the cost-optimal two-action rule (spam iff $\post\ge\tstar$) and the full rule with inspection. It
+runs logistic regression and Member 3's two Gaussian models on Spambase (standardised, no
+$\log(1+x)$) and on a synthetic five-dimensional data set whose two classes have different
+covariances. On the synthetic data an \emph{oracle} applies the same rules to the exact posterior.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{task2_loss_spambase.png}
+\caption{Spambase: realized test loss of the three rules against $\cfp/\cfn$ (log scale) for each
+model, mean $\pm$ standard error over 20 splits, $\ci=0.1$.}
+\label{fig:t2}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering\small
+\input{\resultsdir/task2_loss_spambase.tex}
+\caption{Spambase: realized test loss at three cost ratios (mean $\pm$ standard error, 20 splits).}
+\label{tab:t2}
+\end{table}
+
+\begin{table}[!htbp]
+\centering\small
+\input{\resultsdir/task2_loss_synthetic.tex}
+\caption{Synthetic data: realized test loss at three cost ratios. ``Oracle'' applies the rule with
+inspection to the exact posterior.}
+\label{tab:t2-syn}
+\end{table}
+
+\paragraph{Results.}
+Figure~\ref{fig:t2} and Tables~\ref{tab:t2} and~\ref{tab:t2-syn} show three things.
+\begin{itemize}
+  \item \emph{The accuracy rule is right only at equal costs.} At $r=1$ it makes the same decisions as
+        the cost rule. At $r=0.1$ it costs logistic regression $0.166$ per email against $0.082$, and
+        at $r=10$ $0.115$ against $0.082$.
+  \item \emph{Inspection is the cheapest rule in every column}, for every model. For logistic
+        regression it brings the loss to $0.050$--$0.053$ while inspecting $23$--$32\%$ of emails.
+  \item \emph{Logistic regression is the best model on Spambase} with every rule at all three
+        ratios. With the two cost-based rules the class-specific Gaussian is the worst. On the synthetic
+        data, where the class-specific Gaussian is the correct model, it is within $0.001$ of the oracle
+        at all three ratios (for example $0.077$ against $0.076$ at $r=0.1$), while logistic regression,
+        which can only draw a linear boundary, is up to $0.023$ worse.
+\end{itemize}
+
+\paragraph{Which emails are inspected.}
+Table~\ref{tab:t2-conf} breaks the logistic model's decisions down by true label (counts per test
+split of about $920$ emails). As real emails become dearer to lose ($r=10$), the two-action rule
+files fewer of them as spam ($9.7$ against $28.8$ for the accuracy rule) but has to deliver $141.6$
+spam to do so. With inspection it files only $6.3$ real emails as spam and delivers $24.4$ spam,
+by sending $209$ uncertain emails, mostly spam, to the inspector. Figure~\ref{fig:t2-rej} shows how the
+share of inspected emails changes with the cost ratio.
+
+\begin{table}[!htbp]
+\centering\footnotesize
+\input{\resultsdir/task2_confusion_spambase_logistic.tex}
+\caption{Spambase, logistic regression: mean confusion matrices (true label $\times$ action) per test
+split, $\ci=0.1$.}
+\label{tab:t2-conf}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{task2_reject_spambase.png}
+\caption{Spambase: share of emails inspected by the rule with inspection against $\cfp/\cfn$, for each
+model ($\ci=0.1$).}
+\label{fig:t2-rej}
+\end{figure}

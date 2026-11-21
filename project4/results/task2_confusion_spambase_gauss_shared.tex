@@ -1,0 +1,26 @@
+\begin{tabular}{llcrrr}
+\toprule
+$\cFP/\cFN$ & Rule & True & Deliver & Spam & Inspect \\
+\midrule
+0.1 & accuracy ($t=0.5$) & real & 529.0 & 28.0 & 0.0 \\
+ &  & spam & 80.5 & 281.5 & 0.0 \\
+ & Bayes, 2-action & real & 403.6 & 153.4 & 0.0 \\
+ &  & spam & 17.9 & 344.1 & 0.0 \\
+ & Bayes + insp. & real & 225.6 & 20.2 & 311.2 \\
+ &  & spam & 3.5 & 245.1 & 113.5 \\
+\midrule
+1 & accuracy ($t=0.5$) & real & 529.0 & 28.0 & 0.0 \\
+ &  & spam & 80.5 & 281.5 & 0.0 \\
+ & Bayes, 2-action & real & 529.0 & 28.0 & 0.0 \\
+ &  & spam & 80.5 & 281.5 & 0.0 \\
+ & Bayes + insp. & real & 415.6 & 8.4 & 132.9 \\
+ &  & spam & 19.4 & 175.7 & 166.9 \\
+\midrule
+10 & accuracy ($t=0.5$) & real & 529.0 & 28.0 & 0.0 \\
+ &  & spam & 80.5 & 281.5 & 0.0 \\
+ & Bayes, 2-action & real & 549.2 & 7.8 & 0.0 \\
+ &  & spam & 191.7 & 170.3 & 0.0 \\
+ & Bayes + insp. & real & 516.0 & 4.3 & 36.8 \\
+ &  & spam & 48.2 & 123.5 & 190.3 \\
+\bottomrule
+\end{tabular}
