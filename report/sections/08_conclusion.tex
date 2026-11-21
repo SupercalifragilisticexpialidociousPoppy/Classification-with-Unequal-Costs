@@ -16,3 +16,13 @@ rescaling the logistic model's log-odds left its accuracy at $93.6\%$ but raised
 the probability scores noticed. Calibration should be checked before deployment; Platt scaling on validation
 data is a cheap repair. When only the spam rate changes, one constant shift of the log-odds restores the
 Bayes rule (Section~\ref{sec:t5}).
+
+\paragraph{Accuracy is the wrong target, and inspection has a price ceiling.}
+% Member 6
+In the analytic model of Section~\ref{sec:t6} every quantity is exact, so the effects are not noise. The most
+accurate rule ($84.6\%$) costs $0.772$ per email, while the cost-optimal rule is less accurate ($73.9\%$) and
+costs $0.311$: when the two errors differ in price, accuracy and cost rank rules in opposite order. Inspection
+helps exactly when it is cheaper than the worst automatic loss, $\ci<\cstar=\cfp\cfn/(\cfp+\cfn)=10/11$; at
+$\ci=0.3$ it cuts the cost from $0.311$ to $0.179$. Every experiment makes and scores its decisions with the
+same shared code, and the threshold rule matches a brute-force minimisation on $10{,}000$ random cases, so
+differences between models are not artefacts of how decisions are made or measured.

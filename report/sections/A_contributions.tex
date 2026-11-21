@@ -1,15 +1,46 @@
 \section{Contribution statement}
 \label{sec:contrib}
+\paragraph{Member 1.} Wrote the introduction (Section~\ref{sec:intro}) and the decision theory of
+Task~1 (Section~\ref{sec:decision}): the loss matrix and inspection assumption with an imperfect-inspection
+variant, the Bayes action for a general loss matrix, the explicit thresholds $\thz$, $\tho$ and the critical
+cost $\cstar$, and the check against Chow's reject rule. Produced Figure~\ref{fig:t1-loss} with
+\path{project4/experiments/t1_expected_loss.py}.
+% Member 1: add the C5 prior-shift experiments here once Section 6.2 is written.
+
+\paragraph{Member 2.} Derived the Gaussian generative classifiers (T2,
+\path{report/sections/03a_gaussian.tex}). Implemented logistic regression from scratch, fitted by
+Newton/IRLS with an L2 penalty and an unpenalised intercept (\path{project4/models/logistic.py}, tests in
+\path{tests/test_logistic.py}), and the Task~2 cost-ratio sweep
+(\path{project4/experiments/task2_cost_sweep.py}), and wrote Section~\ref{sec:task2-results}.
+
+\paragraph{Member 3.} Derived logistic regression and the expected cost of threshold rules (T3,
+Sections~\ref{sec:t3-logreg} and~\ref{sec:t3-cost}): likelihood, gradient, Hessian, convexity, the IRLS
+update and the L2 penalty, the cost of a threshold rule, and Propositions~\ref{prop:t3-half}
+and~\ref{prop:t3-calib}. Implemented the shared- and class-specific-covariance Gaussian classifiers with
+shrinkage chosen on validation (\path{project4/models/gaussian.py}, tests in \path{tests/test_gaussian.py})
+and the $\log(1+x)$ comparison on Spambase (\path{project4/experiments/c2_gaussian.py},
+Section~\ref{sec:c2}).
+
 \paragraph{Member 4.} Derived the T4 scoring-rule proofs, calibration decomposition and
 temperature example in Section~\ref{sec:calibration}. Implemented the C6 held-out
 inspection experiment in \path{project4/experiments/task5_inspection.py}, using the Gaussian
 classifier by Member 3, logistic regression by Member 2, and analytic reference and shared
 infrastructure by Member 6. Section~\ref{sec:c6} reports the generated results.
 The assigned review of Member 5's C4 implementation is pending availability of that code.
-% Other members' contributions belong here.
 
 \paragraph{Member 5.} Derived the T5 prior-shift correction (Section~\ref{sec:t5}) and wrote
 \path{project4/prior_shift.py}, used by the C5 experiments. Implemented the C4 measures in
 \path{project4/calibration.py} and the Task 3 experiment \path{project4/experiments/task3_calibration.py},
 with tests, using the classifiers by Members 2 and 3 and the infrastructure by Member 6
 (Section~\ref{sec:c4}).
+
+\paragraph{Member 6.} Built the shared infrastructure the experiments use: Spambase loading with a
+checksummed cache, stratified $60/20/20$ splits, preprocessing fitted on training data only and label-shift
+resampling (\path{project4/data.py}); the Bayes decision rule (\path{project4/decision.py}); the evaluation
+metrics (\path{project4/metrics.py}); shared configuration, figure style and \path{project4/run_all.py},
+which regenerates every figure and table. Wrote the unit tests for these modules, including a brute-force
+check of the decision rule on $10{,}000$ random cases. Derived the analytic accuracy-vs-cost model (T6,
+Section~\ref{sec:t6}) with \path{project4/analytic.py} and \path{project4/experiments/t6_analytic.py}, wrote
+the experimental setup (Section~\ref{sec:setup}), set up the report template and notation, rewrote the
+proofs of Propositions~\ref{prop:t3-half} and~\ref{prop:t3-calib} step by step, and reviewed Member 4's C6
+implementation.

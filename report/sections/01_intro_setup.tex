@@ -50,6 +50,7 @@ improves the system. Section~\ref{sec:conclusion} summarises the findings.
 % TODO (Member 1): once Sections 4-7 have results, add one sentence with the headline numbers.
 
 \subsection{Experimental setup}
+\label{sec:setup}
 % Member 6 (C1)
 
 \paragraph{Application, actions and losses.}
@@ -68,8 +69,8 @@ statistics of capital letters. The features are heavily skewed and $77\%$ of all
 exactly zero, which matters for the Gaussian models (Section~\ref{sec:models}).
 The \emph{synthetic} data are two-class Gaussian samples with chosen means, covariances and
 prior $\pio$. Because $p(x\mid y)$ is known we can compute the exact posterior and Bayes risk,
-and change the class proportions exactly (Section~6). Section~7 also uses a one-dimensional
-special case with closed-form answers.
+and change the class proportions exactly (Section~\ref{sec:prior-shift}). Section~\ref{sec:accuracy-cost}
+also uses a one-dimensional special case with closed-form answers.
 
 \paragraph{Splits and error bars.}
 Each data set is split into stratified $60/20/20$ train, validation and test parts
@@ -89,8 +90,9 @@ replacement and keep the largest set the data allow.
 
 \paragraph{Code and reproducibility.}
 All models are written from scratch in Python with NumPy; scikit-learn is used only to cross-check
-numbers. The shared modules \texttt{data.py}, \texttt{decision.py} and \texttt{metrics.py} implement
-the interface above. A unit test checks the decision rule of Section~2 against a brute-force
+numbers. The interface above is implemented by three shared modules: \texttt{data.py},
+\texttt{decision.py} and \texttt{metrics.py}. A unit test checks the decision rule of
+Section~\ref{sec:decision} against a brute-force
 minimisation of the posterior expected loss on $10{,}000$ random posteriors and loss matrices,
 covering cases both with and without an inspect band. The command
 \texttt{python -m project4.run\_all} regenerates every figure and table in this report from scratch.
