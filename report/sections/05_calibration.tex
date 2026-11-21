@@ -84,4 +84,75 @@ inspection threshold.
 \begin{assumptions}The groups and labels are fixed for this realized-cost example.
 Inspection always routes the message correctly and costs $0.3$ for either label.\end{assumptions}
 
-% Member 5's C4 empirical calibration diagrams and metrics belong here.
+\subsection{Experiments (C4)}
+\label{sec:c4}
+% Member 5. Numbers from python -m project4.experiments.task3_calibration (results/c4_*.csv).
+
+We now score the forecasts $q$ of both classifiers on real data. On the test part of each of the 20 splits
+we compute the log-loss, the Brier score and $\widehat{\mathrm{ECE}}$ (10 equal-width bins), together with
+the cost of the Bayes rule for $\cfp=10$, $\cfn=1$, $\ci=0.3$. To avoid $\log 0$, $q$ is clipped to
+$[10^{-12},1-10^{-12}]$. Hyperparameters are chosen on the validation part by log-loss.
+
+We use two data sets. The \emph{synthetic} data are $4{,}601$ points from two 2-D Gaussian classes with a
+shared covariance and $\pio=0.4$. Here both models' assumptions hold exactly, so they should be calibrated:
+this checks the code. \emph{Spambase} uses $\log(1+x)$ features, standardised.
+
+\begin{table}[ht]
+\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\input{\resultsdir/c4_scores.tex}
+\caption{Forecast quality on the test part (mean $\pm$ standard error over 20 splits). Accuracy uses
+``spam iff $q\ge0.5$''; Cost and Inspected are for the Bayes rule. ``Bayes (true $p$)'' is the true
+posterior; ``+ Platt'' rows are re-calibrated on the validation part.}
+\label{tab:c4-scores}
+\end{table}
+
+\paragraph{Results.}
+On the synthetic data both models perform as well as the true posterior (log-loss $0.433$ compared with
+$0.432$, and a Brier score of $0.139$ for all three), and their reliability curves lie on the diagonal (Figure~\ref{fig:c4-rel}, top). Even the true posterior has
+$\widehat{\mathrm{ECE}}\approx0.03$: with only $919$ test emails per split, the spam fraction in each bin is
+noisy, so ECE is never exactly $0$.
+
+On Spambase, logistic regression gives better forecasts than the Gaussian model on all three scores: its
+log-loss is $0.185$ (Gaussian $0.224$), its Brier score $0.050$ ($0.061$) and its ECE $0.021$ ($0.039$). It is
+also cheaper, at $0.124$ per email compared with $0.142$, although the two accuracies differ by only $1.3$
+points. The Gaussian model underpredicts spam for $q$ between $0.3$ and $0.6$
+(emails given $0.45$ are spam $65\%$ of the time), right where $\thz=0.3$ lies, because word counts are far
+from Gaussian even after $\log(1+x)$.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{c4_reliability.pdf}
+\caption{Reliability diagrams, using the test parts of all 20 splits together. Points above the diagonal mean the model
+underpredicts spam. The histograms show how many forecasts fall in each bin (log scale).}
+\label{fig:c4-rel}
+\end{figure}
+
+\paragraph{Same accuracy, different cost.}
+To test the example of the previous subsection on real data, we rescale the fitted logistic model on Spambase,
+$q_T=\sigm(\logit q/T)$. Dividing the log-odds by $T>0$ keeps every email on the same side of $0.5$, so
+the accuracy stays $0.936$ for every $T$ (Figure~\ref{fig:c4-temp}). The Bayes rule compares $q_T$ with
+$0.3$ and $0.97$, so its decisions do change. At $T=0.4$ more emails pass $0.97$, real emails sent to spam rise
+from $3.8$ to $10.5$ per split, and the cost rises by a third ($0.124\to0.164$). At $T=2.5$, $46\%$ of the
+emails are inspected (cost $0.149$). Log-loss detects both changes ($0.289$ and $0.249$, compared with $0.185$ at $T=1$), whereas the
+Brier score barely notices the over-confidence ($0.053$ compared with $0.050$). The cost is lowest slightly above $T=1$
+($0.117$ at $T\approx1.2$), so a slightly less confident model would be a little cheaper.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{c4_temperature.pdf}
+\caption{Logistic model on Spambase under temperature scaling ($\pm$ one standard error). Accuracy is flat;
+log-loss and cost rise once $T$ is far from $1$.}
+\label{fig:c4-temp}
+\end{figure}
+
+\paragraph{Re-calibration.}
+Platt scaling fits $q'=\sigm(A\logit q+B)$ on the validation part: a logistic regression with one feature,
+solved with the IRLS update \eqref{eq:t3-irls}. It lowers the Gaussian model's ECE from $0.039$ to $0.024$
+and its cost from $0.142$ to $0.132$; the logistic model changes little (cost $0.124\to0.118$).
+
+\begin{assumptions}
+Test emails follow the training distribution (no prior shift; see Section~\ref{sec:prior-shift}). ECE
+depends on the binning and is biased upwards on small samples. Platt scaling reuses the validation part that
+chose the hyperparameters, so its gain may be slightly optimistic.
+\end{assumptions}
+\texttt{tests/test\_calibration.py} checks every score against hand-worked examples and scikit-learn.
