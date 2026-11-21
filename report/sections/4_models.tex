@@ -8,7 +8,7 @@ kinds of model: one that models $\post$ directly, and one that models what each 
 \textbf{Code:} \code{models/logistic.py}.
 
 The model is $\post=\sigm(w^\top x+b)$, fitted by Newton's method (iteratively reweighted least
-squares) with an L2 penalty on $w$ and none on the intercept. It converges in a few iterations, and
+squares~\cite[Section~4.3]{bishop2006}) with an L2 penalty on $w$ and none on the intercept. It converges in a few iterations, and
 the penalty, chosen on validation log-loss from $10^{-2}$ to $10^{3}$, keeps the weights finite even
 when the classes are separable. The tests check that the gradient is zero at the solution, that the
 fit matches scikit-learn's, and that it recovers the true weights from a large simulated sample.
@@ -17,7 +17,8 @@ fit matches scikit-learn's, and that it recovers the true weights from a large s
 \label{sec:gaussian}
 \textbf{Code:} \code{models/gaussian.py}, \code{experiments/c2\_gaussian.py}.
 
-Here each class is modelled as a multivariate Gaussian, and Bayes' rule gives $\post$. The
+Here each class is modelled as a multivariate Gaussian, and Bayes' rule gives
+$\post$~\cite[Section~4.2]{bishop2006}. The
 \emph{shared} model pools one covariance matrix for both classes, which gives a linear boundary; the
 \emph{class-specific} model fits one per class, which gives a quadratic one. On Spambase many features
 are almost always zero within a class, so the raw covariances are singular. We shrink them towards a

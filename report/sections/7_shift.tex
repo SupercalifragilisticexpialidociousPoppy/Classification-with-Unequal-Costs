@@ -36,7 +36,8 @@ each deployment rate $\pion$ from $0.05$ to $0.8$. On Spambase (trained at $\pio
 is resampled within each class to the new rate, for example $586$ emails of which $29$ are spam at
 $\pion=0.05$. Both the shared Gaussian model and logistic regression are used, and the decisions are
 made on four versions of $\post$: uncorrected, corrected with the true $\pion$, corrected with $\pion$
-estimated from the unlabelled test emails by the EM method of Saerens et al.~\cite{saerens2002}, and
+estimated from the unlabelled test emails (an EM iteration that sets the rate to the average corrected
+probability until it stops changing), and
 (synthetic only) the true posterior.
 
 \begin{figure}[!htbp]

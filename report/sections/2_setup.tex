@@ -7,7 +7,7 @@ Before any model could be compared, every experiment had to use the same data, t
 the same way of turning probabilities into actions and costs.
 
 \paragraph{Data and splits.}
-\emph{Spambase}~\cite{spambase} has $4{,}601$ emails, $1{,}813$ ($39.4\%$) of them spam, described by
+The UCI \emph{Spambase} data set has $4{,}601$ emails, $1{,}813$ ($39.4\%$) of them spam, described by
 57 word, character and capital-letter statistics. The features are heavily skewed and $77\%$ of all
 values are exactly zero. \code{data.py} downloads and checksums the data, makes stratified
 $60/20/20$ train/validation/test splits ($2{,}761/921/919$ emails), and fits the standardisation

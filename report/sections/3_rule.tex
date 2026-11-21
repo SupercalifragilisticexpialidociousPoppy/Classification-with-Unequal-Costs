@@ -13,7 +13,8 @@ one. Reading off where the lines cross gives the rule
 \]
 An email goes to the spam folder only if the model is at least $97\%$ sure, because losing a real email
 costs ten times as much as delivering a spam. Without inspection the rule is a single cut at
-$\tstar=\cfp/(\cfp+\cfn)=10/11\approx0.91$, not the $0.5$ that maximises accuracy. The flat inspect line
+$\tstar=\cfp/(\cfp+\cfn)=10/11\approx0.91$, not the $0.5$ that maximises accuracy. This is the
+minimum-expected-loss rule with a reject option~\cite[Section~1.5]{bishop2006}. The flat inspect line
 only helps if it lies below the peak where the other two cross, which is at height
 $\cstar=\cfp\cfn/(\cfp+\cfn)=10/11$. At $\ci=1$ it does not, and the rule falls back to the single cut
 (Figure~\ref{fig:t1}, right).
