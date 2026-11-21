@@ -1,0 +1,76 @@
+\section{When the share of spam changes}
+\label{sec:shift}
+A filter trained where $39\%$ of emails are spam may be used where only $5\%$ are. Its probabilities
+then overstate spam, and the thresholds of Section~\ref{sec:rule} act on the wrong numbers.
+
+\subsection{Correcting the probabilities (Member 5)}
+\label{sec:t5}
+\textbf{Code:} \code{prior\_shift.py}, \code{experiments/t5\_prior\_correction.py}.
+
+If spam still looks the same and only its share changes from $\pio$ to $\pion$, every email's
+log-odds should move by the same amount, so \code{prior\_shift.py} corrects the model's output as
+\[
+  \post'=\sigm\!\big(\logit\post+\lshift\big),\qquad
+  \lshift=\log\frac{\pion}{1-\pion}-\log\frac{\pio}{1-\pio}.
+\]
+For example, a model trained at $\pio=0.5$ and deployed at $\pion=0.1$ turns $\post=0.98$ into
+$\post'\approx0.845$, so that email is inspected instead of filed as spam. Equivalently, the
+thresholds can be moved instead of the probabilities (Figure~\ref{fig:t5}).
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{t5_prior_correction.pdf}
+\caption{Prior-shift correction for a model trained at $\pio=0.5$. Left: corrected $\post'$ against
+$\post$. Right: the equivalent thresholds on the uncorrected $\post$ for every deployment rate $\pion$;
+the shaded band is the inspect region.}
+\label{fig:t5}
+\end{figure}
+
+\subsection{Testing the correction (Member 1)}
+\label{sec:c5}
+\textbf{Code:} \code{experiments/task4\_prior\_shift.py}.
+
+We tested the correction on data where only the spam rate changes, with $\cfp=10$, $\cfn=1$,
+$\ci=0.3$. On synthetic data the models are trained at $\pio=0.5$ and tested on fresh samples at
+each deployment rate $\pion$ from $0.05$ to $0.8$. On Spambase (trained at $\pio=0.394$) the test part
+is resampled within each class to the new rate, for example $586$ emails of which $29$ are spam at
+$\pion=0.05$. Both the shared Gaussian model and logistic regression are used, and the decisions are
+made on four versions of $\post$: uncorrected, corrected with the true $\pion$, corrected with $\pion$
+estimated from the unlabelled test emails by the EM method of Saerens et al.~\cite{saerens2002}, and
+(synthetic only) the true posterior.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.88\linewidth]{c5_prior_shift.pdf}
+\caption{Realized loss against the deployment spam rate $\pion$, without correction, with the known
+$\pion$ and with $\pion$ estimated by EM (bands: $\pm1$ standard error over 20 splits). Dashed: the
+true posterior. Dotted: the training rate.}
+\label{fig:c5}
+\end{figure}
+
+\begin{table}[!htbp]
+\centering\footnotesize
+\input{\resultsdir/c5_loss_spambase.tex}
+\caption{Spambase: realized loss after the spam rate changes to $\pion$ (training rate $0.394$),
+without correction, corrected with the known $\pion$, and corrected with the EM estimate
+(mean $\pm$ standard error, 20 splits).}
+\label{tab:c5}
+\end{table}
+
+Figure~\ref{fig:c5} and Table~\ref{tab:c5} show the following.
+\begin{itemize}
+  \item \emph{The correction pays off, and more so the larger the shift.} At $\pion=0.05$ it more than
+        halves the loss: on Spambase from $0.095$ to $0.038$ (logistic) and from $0.108$ to $0.051$
+        (Gaussian); on synthetic data from $0.154$ and $0.137$ to $0.040$, close to the $0.034$ of the
+        true posterior. At the training rate the curves coincide, as they should.
+  \item \emph{Where the saving comes from.} Without correction the filter still believes half of the
+        synthetic emails are spam, so it inspects $43$--$49\%$ of them; after correction it inspects
+        $1.6\%$. The corrected filter is slightly \emph{less} accurate ($96.4\%$ against $98.7\%$ on the
+        emails it does not inspect) but three to four times cheaper.
+  \item \emph{An unknown rate can be estimated if the model is calibrated.} For logistic regression on
+        Spambase the EM estimate is off by $0.007$--$0.013$ on average and the loss is almost the same as
+        with the true rate. The Gaussian model's estimate is too low: by $0.04$--$0.07$ on synthetic data,
+        and by $0.036$--$0.047$ on Spambase once $\pion\ge0.4$.
+\end{itemize}
+Again the more accurate filter was not the cheaper one. The last part of the project measured this
+trade-off directly, together with the value of inspection.
