@@ -18,24 +18,14 @@ inspect       & $\ci=0.3$     & $\ci=0.3$ \\
 \bottomrule
 \end{tabular}
 \end{center}
-If a model says an email is spam with probability $\post$, delivering it costs $\cfn\post$ on average,
-filing it as spam costs $\cfp(1-\post)$, and inspecting it costs $\ci$. Choosing the cheapest of the
-three~\cite[Section~1.5]{bishop2006} gives the rule
-\[
-  \text{deliver if } \post\le\thz=\frac{\ci}{\cfn}=0.3,\qquad
-  \text{spam folder if } \post\ge\tho=1-\frac{\ci}{\cfp}=0.97,\qquad
-  \text{inspect in between.}
-\]
-Without inspection the rule is a single cut at $\tstar=\cfp/(\cfp+\cfn)=10/11\approx0.91$, not the
-$0.5$ that maximises accuracy, and inspection is worth offering only if it costs less than
-$\cstar=\cfp\cfn/(\cfp+\cfn)=10/11$. Everything we report is the \emph{realized loss}: the average of
-these costs over held-out emails.
+Everything we report is the \emph{realized loss}: the average of these costs over held-out emails.
 
-Each section below is one member's part of the project, in the order the work built up. Member 6
-set up the shared pipeline and an exact model that predicts what to expect
-(Section~\ref{sec:m6}). Members 3 and 2 built the two classifiers, and Member 2 used them to compare
-the accuracy rule with the cost rule (Sections~\ref{sec:m3} and~\ref{sec:m2}). Member 5 checked how
-far the models' probabilities can be trusted and how to correct them when the share of spam changes
-(Section~\ref{sec:m5}), and Member 1 tested that correction (Section~\ref{sec:m1}). Member 4 closed
-the loop by measuring what inspection saves on held-out data (Section~\ref{sec:m4}). All models are
-written from scratch in Python and NumPy.
+The report follows the project in the order we did it. We first built a shared pipeline for data,
+decisions and scoring (Section~\ref{sec:setup}) and worked out which action is cheapest for a given
+spam probability (Section~\ref{sec:rule}). That rule needs a probability, so we wrote two classifiers
+(Section~\ref{sec:models}) and tested the rule against the usual accuracy rule as the two error costs
+move apart (Section~\ref{sec:sweep}). The results showed that good decisions need trustworthy
+probabilities, which we checked next (Section~\ref{sec:calib}). We then asked what happens when the
+share of spam changes after training (Section~\ref{sec:shift}), and finally how much inspection is
+worth and at what price it stops paying (Section~\ref{sec:inspect}). The member in brackets after each
+heading wrote the code behind it. All models are written from scratch in Python and NumPy.

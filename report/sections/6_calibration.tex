@@ -1,7 +1,6 @@
-\section{Trustworthy probabilities and a changing spam rate (Member~5)}
-\label{sec:m5}
-\textbf{Code:} \code{calibration.py}, \code{prior\_shift.py}, and in \code{experiments/}:
-\code{task3\_calibration.py}, \code{t5\_prior\_correction.py}.
+\section{Can the probabilities be trusted? (Member 5)}
+\label{sec:calib}
+\textbf{Code:} \code{calibration.py}, \code{experiments/task3\_calibration.py}.
 
 Accuracy only asks whether $\post$ is on the right side of $0.5$. Our rule compares $\post$ with
 $0.3$ and $0.97$, so it needs $\post$ to be \emph{calibrated}: of the emails given $\post=0.8$, about
@@ -21,7 +20,6 @@ uses $\log(1+x)$ features. ``+ Platt'': re-calibrated on validation data.}
 \label{tab:c4}
 \end{table}
 
-\paragraph{How good are the probabilities?}
 On synthetic data, where both models' assumptions hold, they are as good as the true posterior
 (Table~\ref{tab:c4}), which checks the code. On Spambase, logistic regression beats the Gaussian
 model on every score (log-loss $0.185$ against $0.224$, ECE $0.021$ against $0.039$) and costs
@@ -52,25 +50,5 @@ third. Log-loss detects this; the Brier score barely moves.
 \label{tab:c4-temp}
 \end{table}
 
-\paragraph{When the share of spam changes.}
-So far the test emails came from the same mix as the training emails. A filter trained where $39\%$
-of emails are spam may be used where only $5\%$ are; its probabilities then overstate spam. If spam
-still looks the same and only its share changes from $\pio$ to $\pion$, every email's log-odds should
-move by the same amount, so \code{prior\_shift.py} corrects the model's output as
-\[
-  \post'=\sigm\!\big(\logit\post+\lshift\big),\qquad
-  \lshift=\log\frac{\pion}{1-\pion}-\log\frac{\pio}{1-\pio}.
-\]
-For example, a model trained at $\pio=0.5$ and deployed at $\pion=0.1$ turns $\post=0.98$ into
-$\post'\approx0.845$, so that email is inspected instead of filed as spam. Equivalently, the
-thresholds can be moved instead of the probabilities (Figure~\ref{fig:t5}). Member 1 tested this
-correction next.
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.92\linewidth]{t5_prior_correction.pdf}
-\caption{Prior-shift correction for a model trained at $\pio=0.5$. Left: corrected $\post'$ against
-$\post$. Right: the equivalent thresholds on the uncorrected $\post$ for every deployment rate $\pion$;
-the shaded band is the inspect region.}
-\label{fig:t5}
-\end{figure}
+So far the test emails came from the same mix as the training emails. A deployed filter cannot count
+on that, which led to the next question.

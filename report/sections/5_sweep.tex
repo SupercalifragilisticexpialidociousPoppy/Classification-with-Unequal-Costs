@@ -1,16 +1,9 @@
-\section{Logistic regression and the accuracy-versus-cost sweep (Member~2)}
-\label{sec:m2}
-\textbf{Code:} \code{models/logistic.py}, \code{experiments/task2\_cost\_sweep.py}.
+\section{Accuracy rule or cost rule? (Member 2)}
+\label{sec:sweep}
+\textbf{Code:} \code{experiments/task2\_cost\_sweep.py}.
 
-The second model gets $\post$ directly instead of describing each class: $\post=\sigm(w^\top x+b)$,
-fitted by Newton's method (iteratively reweighted least squares~\cite[Section~4.3]{bishop2006}) with an
-L2 penalty on $w$ and none on the intercept. It converges in a few iterations, and the penalty, chosen
-on validation log-loss from $10^{-2}$ to $10^{3}$, keeps the weights finite even when the classes are
-separable. The tests check that the gradient is zero at the solution, that the fit matches
-scikit-learn's, and that it recovers the true weights from a large simulated sample.
-
-With both classifiers in place, the next question was how much the choice of rule matters as the two
-error costs move apart. The sweep varies the ratio $r=\cfp/\cfn$ from $1/20$ to $20$ (with
+With both classifiers in place, the first question was how much the choice of rule matters as the
+two error costs move apart. The sweep varies the ratio $r=\cfp/\cfn$ from $1/20$ to $20$ (with
 $\cfp=\sqrt r$, $\cfn=1/\sqrt r$ and $\ci=0.1$) and applies three rules to the same fitted
 probabilities: the accuracy rule (spam iff $\post\ge0.5$), the cost rule without inspection (spam iff
 $\post\ge\tstar$) and the full rule with inspection. It runs logistic regression and both Gaussian
@@ -79,5 +72,4 @@ model ($\ci=0.1$).}
 \end{figure}
 
 The rule compares $\post$ with thresholds far from $0.5$, so a model's cost depends on how far its
-probabilities can be trusted, not only on which side of $0.5$ they fall. That is what Member 5
-checked next.
+probabilities can be trusted, not only on which side of $0.5$ they fall. That is what we checked next.

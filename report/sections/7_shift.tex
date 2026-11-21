@@ -1,30 +1,44 @@
-\section{Testing the decision rule under a changing spam rate (Member~1)}
-\label{sec:m1}
-\textbf{Code:} \code{experiments/t1\_expected\_loss.py}, \code{experiments/task4\_prior\_shift.py}.
+\section{When the share of spam changes}
+\label{sec:shift}
+A filter trained where $39\%$ of emails are spam may be used where only $5\%$ are. Its probabilities
+then overstate spam, and the thresholds of Section~\ref{sec:rule} act on the wrong numbers.
 
-Figure~\ref{fig:t1} shows why a shift in the spam rate matters. The rule of Section~\ref{sec:intro}
-picks the lowest of three cost lines, so an email's action depends only on where its $\post$ falls
-relative to $0.3$ and $0.97$. When spam becomes rarer, an uncorrected model's $\post$ sits too far to
-the right, and emails land in the wrong region. The flat inspect line only helps while it lies below
-the peak where the other two cross, at height $\cstar=10/11$; at $\ci=1$ it does not, and the rule falls
-back to the single cut at $10/11$ (right panel).
+\subsection{Correcting the probabilities (Member 5)}
+\label{sec:t5}
+\textbf{Code:} \code{prior\_shift.py}, \code{experiments/t5\_prior\_correction.py}.
+
+If spam still looks the same and only its share changes from $\pio$ to $\pion$, every email's
+log-odds should move by the same amount, so \code{prior\_shift.py} corrects the model's output as
+\[
+  \post'=\sigm\!\big(\logit\post+\lshift\big),\qquad
+  \lshift=\log\frac{\pion}{1-\pion}-\log\frac{\pio}{1-\pio}.
+\]
+For example, a model trained at $\pio=0.5$ and deployed at $\pion=0.1$ turns $\post=0.98$ into
+$\post'\approx0.845$, so that email is inspected instead of filed as spam. Equivalently, the
+thresholds can be moved instead of the probabilities (Figure~\ref{fig:t5}).
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.92\linewidth]{t1_expected_loss.pdf}
-\caption{Expected cost of delivering, filing as spam and inspecting against $\post$, for
-$\cfp=10$, $\cfn=1$. Shading marks where each action is cheapest. Left: $\ci=0.3$. Right: $\ci=1$.}
-\label{fig:t1}
+\includegraphics[width=0.92\linewidth]{t5_prior_correction.pdf}
+\caption{Prior-shift correction for a model trained at $\pio=0.5$. Left: corrected $\post'$ against
+$\post$. Right: the equivalent thresholds on the uncorrected $\post$ for every deployment rate $\pion$;
+the shaded band is the inspect region.}
+\label{fig:t5}
 \end{figure}
 
-We tested Member 5's correction on data where only the spam rate changes, with $\cfp=10$, $\cfn=1$,
+\subsection{Testing the correction (Member 1)}
+\label{sec:c5}
+\textbf{Code:} \code{experiments/task4\_prior\_shift.py}.
+
+We tested the correction on data where only the spam rate changes, with $\cfp=10$, $\cfn=1$,
 $\ci=0.3$. On synthetic data the models are trained at $\pio=0.5$ and tested on fresh samples at
 each deployment rate $\pion$ from $0.05$ to $0.8$. On Spambase (trained at $\pio=0.394$) the test part
 is resampled within each class to the new rate, for example $586$ emails of which $29$ are spam at
 $\pion=0.05$. Both the shared Gaussian model and logistic regression are used, and the decisions are
 made on four versions of $\post$: uncorrected, corrected with the true $\pion$, corrected with $\pion$
 estimated from the unlabelled test emails (an EM iteration that sets the rate to the average corrected
-probability until it stops changing), and (synthetic only) the true posterior.
+probability until it stops changing), and
+(synthetic only) the true posterior.
 
 \begin{figure}[!htbp]
 \centering
@@ -59,5 +73,5 @@ Figure~\ref{fig:c5} and Table~\ref{tab:c5} show the following.
         with the true rate. The Gaussian model's estimate is too low: by $0.04$--$0.07$ on synthetic data,
         and by $0.036$--$0.047$ on Spambase once $\pion\ge0.4$.
 \end{itemize}
-Once again the more accurate filter was not the cheaper one, and much of the saving came from how
-many emails were sent to the inspector. Member 4 measured that directly.
+Again the more accurate filter was not the cheaper one. The last part of the project measured this
+trade-off directly, together with the value of inspection.

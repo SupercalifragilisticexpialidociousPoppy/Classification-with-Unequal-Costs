@@ -1,0 +1,54 @@
+\section{Two classifiers that output probabilities}
+\label{sec:models}
+The rule of Section~\ref{sec:rule} needs a spam probability $\post$ for every email, so we built two
+kinds of model: one that models $\post$ directly, and one that models what each class looks like.
+
+\subsection{Logistic regression (Member 2)}
+\label{sec:logistic}
+\textbf{Code:} \code{models/logistic.py}.
+
+The model is $\post=\sigm(w^\top x+b)$, fitted by Newton's method (iteratively reweighted least
+squares~\cite[Section~4.3]{bishop2006}) with an L2 penalty on $w$ and none on the intercept. It converges in a few iterations, and
+the penalty, chosen on validation log-loss from $10^{-2}$ to $10^{3}$, keeps the weights finite even
+when the classes are separable. The tests check that the gradient is zero at the solution, that the
+fit matches scikit-learn's, and that it recovers the true weights from a large simulated sample.
+
+\subsection{Gaussian classifiers (Member 3)}
+\label{sec:gaussian}
+\textbf{Code:} \code{models/gaussian.py}, \code{experiments/c2\_gaussian.py}.
+
+Here each class is modelled as a multivariate Gaussian, and Bayes' rule gives
+$\post$~\cite[Section~4.2]{bishop2006}. The
+\emph{shared} model pools one covariance matrix for both classes, which gives a linear boundary; the
+\emph{class-specific} model fits one per class, which gives a quadratic one. On Spambase many features
+are almost always zero within a class, so the raw covariances are singular. We shrink them towards a
+multiple of the identity, $S\mapsto(1-\alpha)S+\alpha\,\tfrac{\operatorname{tr}S}{d}I$, with $\alpha$
+chosen on validation log-loss. All densities are computed in the log domain from Cholesky factors,
+without inverting any matrix. The shared model agrees with scikit-learn's LDA to $10^{-8}$ and the
+class-specific model with its QDA to $10^{-6}$.
+
+Word counts are far from Gaussian, so we also tried $\log(1+x)$ before standardising
+(Table~\ref{tab:c2}, Figure~\ref{fig:c2}). The transform helps both models. For the shared model the
+test log-loss falls from $0.305$ to $0.223$ and the cost with inspection from $0.172$ to $0.143$. The
+class-specific model stays far worse with either preprocessing: each class needs its own
+$57\times57$ covariance, validation chooses heavy shrinkage ($\alpha\approx0.9$), and $2{,}761$
+training emails are not enough to pay for the extra flexibility. The calibration and spam-rate
+experiments (Sections~\ref{sec:calib} and~\ref{sec:shift}) therefore use the shared model with
+$\log(1+x)$ features on Spambase.
+
+\begin{table}[!htbp]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\input{\resultsdir/c2_gaussian_summary.tex}
+\caption{Gaussian classifiers on Spambase, test mean $\pm$ standard error over 20 splits. $\alpha$:
+chosen shrinkage (median). Accuracy uses the cut $0.5$; ``Loss $\tstar$'' is the cost of the
+two-action rule and ``Loss Bayes'' that of the rule with inspection ($\cfp=10$, $\cfn=1$, $\ci=0.3$).}
+\label{tab:c2}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.8\linewidth]{c2_gaussian_log1p.pdf}
+\caption{Spambase: test log-loss and realized loss of the two Gaussian models with and without
+$\log(1+x)$ (mean $\pm$ standard error over 20 splits).}
+\label{fig:c2}
+\end{figure}
