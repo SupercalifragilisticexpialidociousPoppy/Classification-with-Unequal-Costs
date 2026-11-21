@@ -36,8 +36,10 @@ $a=r$ inspect        & $\ci$   & $\ci$ \\
   \item \emph{$\cfn=1$.} A spam in the inbox costs a few seconds to recognise and delete. We use it as
         the unit of loss.
   \item \emph{$\ci=0.3$.} Held emails go to a review queue that a person scans in batches. Checking one
-        is cheaper than dealing with a spam in the inbox, but not free. This value is a placeholder:
-        Section~\ref{sec:accuracy-cost} varies $\ci$ over its whole range.
+        is cheaper than dealing with a spam in the inbox, but not free. We take $0.3$ as a
+        representative price: it lies well below the cut-off $\cstar$ of Section~\ref{sec:thresholds},
+        so inspection is worth using. The conclusions do not rest on this value, because
+        Section~\ref{sec:accuracy-cost} treats every $\ci$.
 \end{itemize}
 Only the ratios $\cfp:\cfn:\ci$ affect the decisions, because multiplying every loss by a constant
 does not change which action is cheapest.
