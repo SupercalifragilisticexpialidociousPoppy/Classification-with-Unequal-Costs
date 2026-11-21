@@ -8,3 +8,11 @@ the spam-folder threshold raises cost from $0.25$ to $1.10$ per email. In the Sp
 experiment, inspecting roughly one in four emails at price $0.3$ reduced realized loss for
 both fitted models. The appropriate comparison depends on the cost of an error, the price of
 review, and how much probability mass actually enters the inspection band.
+
+\paragraph{Forecast quality and the prior correction.}
+% Member 5
+A cost-sensitive filter acts on the value of a forecast, not only on its side of $0.5$. On Spambase,
+rescaling the logistic model's log-odds left its accuracy at $93.6\%$ but raised its cost by a third, and only
+the probability scores noticed. Calibration should be checked before deployment; Platt scaling on validation
+data is a cheap repair. When only the spam rate changes, one constant shift of the log-odds restores the
+Bayes rule (Section~\ref{sec:t5}).
