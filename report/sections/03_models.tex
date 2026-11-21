@@ -221,23 +221,7 @@ $\cfp=(\cfp+\cfn)\,\tstar$, which is the definition of $\tstar$ multiplied by $\
 \]
 where the indicator $\mathbf 1\{\cdot\}$ is $1$ for emails in $A$ and $0$ for all others. Substituting this
 into \eqref{eq:t3-gap-avg} gives the formula of the proposition.
-
-\emph{Step 6: the sign.} For an email in $A$ we have $\post<\tstar$, so $\tstar-\post>0$; also $\cfp+\cfn>0$.
-For an email outside $A$ the term is $0$. An average of numbers that are all $\ge0$ is $\ge0$, so
-$R(\tfrac12)-R(\tstar)\ge0$. If emails with $\tfrac12<\post<\tstar$ occur with positive probability, the
-term is strictly positive on a set of positive probability, so the average is strictly positive.
-
-\emph{Step 7: the other cases.} If $\cfp<\cfn$ then $\tstar<\tfrac12$. The rules now disagree on
-$\{\tstar\le\post<\tfrac12\}$, where the rule $t=\tstar$ sends to spam and the rule $t=\tfrac12$ delivers.
-The same algebra gives $\cfn\post-\cfp(1-\post)=(\cfp+\cfn)(\post-\tstar)\ge0$ there. If $\cfp=\cfn$ then
-$\tstar=\tfrac12$, the two rules are identical and the gap is $0$.
 \end{proof}
-
-\emph{Why $\tstar$ beats every two-action rule, not only $t=\tfrac12$.} For one email, the spam folder
-costs no more than delivering exactly when $\cfp(1-\post)\le\cfn\post$, i.e.\ $\cfp\le(\cfp+\cfn)\post$,
-i.e.\ $\post\ge\tstar$. So the rule $t=\tstar$ takes the cheaper of the two actions for every email:
-$\ell_{\tstar}(x)=\min\{\cfn\post(x),\,\cfp(1-\post(x))\}\le\ell_t(x)$ for any threshold $t$. Averaging over
-emails gives $R(\tstar)\le R(t)$.
 
 \emph{In numbers.} With our costs ($\cfp=10$, $\cfn=1$, so $\cfp+\cfn=11$ and $\tstar=10/11\approx0.909$),
 every email with $0.5\le\post<0.909$ costs the accuracy rule an extra $11\,(0.909-\post)$. For example, an
