@@ -24,6 +24,24 @@ def test_em_stays_at_the_training_prior_without_shift():
     assert c5.em_prior(p, 0.4)[0] == pytest.approx(0.4, abs=0.01)
 
 
+@pytest.mark.parametrize("pi_train", [0.05, 0.394, 0.5, 0.8])
+def test_no_shift_correction_changes_no_action(pi_train):
+    # Correcting to the training prior itself must leave every decision as it was.
+    from project4.config import DEFAULT_LOSS
+    from project4.decision import bayes_action
+    from project4.prior_shift import adjust_posterior
+
+    p = np.random.default_rng(3).random(100_000)
+    assert np.array_equal(bayes_action(adjust_posterior(p, pi_train, pi_train), DEFAULT_LOSS),
+                          bayes_action(p, DEFAULT_LOSS))
+
+
+def test_seeds_are_fixed_per_prior():
+    # Adding a deployment prior must never change the samples drawn at the others.
+    assert set(c5.DEPLOY_SEED_OFFSET) == set(c5.DEPLOY_PRIORS)
+    assert len(set(c5.DEPLOY_SEED_OFFSET.values())) == len(c5.DEPLOY_PRIORS)
+
+
 def test_run_split_synthetic_smoke(monkeypatch):
     monkeypatch.setattr(c5, "DEPLOY_PRIORS", (0.05, 0.8))
     monkeypatch.setattr(c5, "CONFUSION_PRIOR", 0.05)

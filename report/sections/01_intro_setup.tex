@@ -39,13 +39,13 @@ expected loss, and gives explicit thresholds with and without an inspect option.
 Section~\ref{sec:models} presents the two classifiers we compare: a Gaussian generative classifier
 (with shared or class-specific covariance) and logistic regression, both written from scratch.
 Section~\ref{sec:task2-results} compares accuracy-based and loss-minimising decisions over a range of cost
-ratios, with confusion matrices and average realised loss.
+ratios, with confusion matrices and average realized loss.
 Section~\ref{sec:calibration} measures probability quality with log-loss, the Brier score and
 reliability plots, and explains why correct labels alone do not guarantee good decisions.
 Section~\ref{sec:prior-shift} changes the class proportions at deployment while keeping $p(x\mid y)$
 fixed, derives the posterior-odds correction for known priors, and tests it.
 Section~\ref{sec:accuracy-cost} shows a setting where higher accuracy comes with higher cost, traces
-realised cost and rejection rate as the inspection cost varies, and determines when allowing rejection
+realized cost and rejection rate as the inspection cost varies, and determines when allowing rejection
 improves the system. Section~\ref{sec:conclusion} summarises the findings.
 
 \paragraph{Main findings.}

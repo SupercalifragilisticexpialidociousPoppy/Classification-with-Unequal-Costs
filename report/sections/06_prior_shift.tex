@@ -151,8 +151,9 @@ Throughout, $\cfp=10$, $\cfn=1$ and $\ci=0.3$.
 \begin{itemize}[itemsep=1pt,topsep=2pt]
   \item \emph{Synthetic.} The two 5-dimensional Gaussian classes of Section~\ref{sec:task2-results}
         (different covariances). Training and validation data are drawn with $\pio=0.5$. For each
-        deployment share $\pion\in\{0.05,0.1,0.2,0.4,0.6,0.8\}$ we draw a fresh sample of $5{,}000$ emails at
-        $\pion$, so $p(x\mid y)$ is exactly the same as in training.
+        deployment share $\pion$ in $\{0.05,\allowbreak 0.1,\allowbreak 0.2,\allowbreak 0.4,\allowbreak 0.5,\allowbreak
+        0.6,\allowbreak 0.8\}$ we draw a fresh sample of $5{,}000$ emails at $\pion$, so $p(x\mid y)$ is exactly the
+        same as in training. The share $0.5$ is the training share itself: a no-shift check.
   \item \emph{Spambase.} The usual split ($\pio=0.394$). Each deployment set is the test part resampled
         within each class to the share $\pion$, without replacement and as large as the test part allows
         (for example $586$ emails, $29$ of them spam, at $\pion=0.05$).
@@ -169,13 +170,14 @@ Everything is repeated over the 20 splits; we report the mean realized loss with
 
 \paragraph{Estimating an unknown deployment prior.}
 In practice $\pion$ is rarely known. Following Saerens et al.~\cite{saerens2002}, we estimate it from the
-model's outputs on the unlabelled deployment emails by iterating
+model's outputs on the $M$ unlabelled deployment emails by iterating
 \[
-  \hat\pi_1' \;\leftarrow\; \frac1N\sum_{n=1}^N \post'_n(\hat\pi_1'),
-  \qquad \post'_n(\hat\pi_1') = \text{the corrected posterior \eqref{eq:t5-shift} of email $n$ at prior }\hat\pi_1',
+  \hat{\pion} \;\leftarrow\; \frac1M\sum_{m=1}^M \post'_m(\hat{\pion}),
+  \qquad \post'_m(\hat{\pion}) = \text{the corrected posterior \eqref{eq:t5-shift} of email $m$ at prior }\hat{\pion},
 \]
-starting from $\hat\pi_1'=\pio$. This is the EM algorithm for the unknown class proportion, so its fixed point is
-the maximum-likelihood estimate, provided the model's posteriors are calibrated.
+starting from $\hat{\pion}=\pio$. This is the EM algorithm for the unknown class proportion, so its fixed point is
+the maximum-likelihood estimate of $\pion$ given the model's posteriors. That estimate is close to the true
+$\pion$ only if those posteriors are calibrated.
 
 \begin{figure}[ht]
 \centering
@@ -201,6 +203,16 @@ known $\pion$, correction with $\pion$ estimated by EM, and the true posterior.}
 \begin{table}[ht]
 \centering
 \small
+\input{\resultsdir/c5_gain.tex}
+\caption{Loss saved by the correction with the known $\pion$: uncorrected minus corrected loss, paired by
+split, mean $\pm$ standard error over 20 splits. Pairing removes the variation the two methods share, so
+these errors are much smaller than those of Table~\ref{tab:c5-loss}.}
+\label{tab:c5-gain}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\small
 \resizebox{\linewidth}{!}{\input{\resultsdir/c5_confusion.tex}}
 \caption{Mean confusion matrices per deployment set at $\pion=0.05$ (synthetic: $5{,}000$ emails;
 Spambase: $586$ emails), without and with the correction (known $\pion$).}
@@ -208,14 +220,19 @@ Spambase: $586$ emails), without and with the correction (known $\pion$).}
 \end{table}
 
 \paragraph{Results.}
-Figure~\ref{fig:c5} and Table~\ref{tab:c5-loss} show the following.
+Figure~\ref{fig:c5} and Tables~\ref{tab:c5-loss} and~\ref{tab:c5-gain} show the following.
 \begin{enumerate}[itemsep=2pt,topsep=2pt]
   \item \emph{The correction pays off whenever the share moves, and the gain grows with the shift.}
         At $\pion=0.05$ it cuts the loss by more than half for both models on both data sets: on Spambase from
         $0.095$ to $0.038$ (logistic) and from $0.108$ to $0.051$ (Gaussian), and on synthetic data from
-        $0.154$ and $0.137$ to $0.040$, close to the oracle's $0.035$. At $\pion=0.8$ it cuts the loss by a
-        quarter to a third. At $\pion=0.4$, which on Spambase is almost the training share, the two curves coincide, as
-        they should.
+        $0.154$ and $0.137$ to $0.040$, close to the oracle's $0.034$. At $\pion=0.8$ it cuts the loss by a
+        quarter to a third. The paired gains of Table~\ref{tab:c5-gain} are positive by several standard errors
+        whenever the share moves by $0.1$ or more on synthetic data, or by $0.2$ or more on Spambase; the small move
+        from $0.394$ to $0.5$ on Spambase gains $0.003\pm0.002$ and $0.001\pm0.002$, within noise. Even on Spambase at
+        $\pion=0.6$, where the bands of Figure~\ref{fig:c5} overlap,
+        the gain is $0.012\pm0.003$ (logistic) and $0.015\pm0.003$ (Gaussian). At the training share the
+        curves coincide, as they should: the paired gain is $-0.0001\pm0.0006$ and $0.0004\pm0.0002$ on Spambase at
+        $\pion=0.4$ (training share $0.394$), and at most $0.0001$ on synthetic data at $\pion=0.5$.
   \item \emph{Where the gain comes from.} When spam becomes rare, the uncorrected filter still believes that
         $39\%$ (Spambase) or $50\%$ (synthetic) of emails are spam. It inspects far too many emails (on synthetic
         data $43$--$49\%$ of all emails, against $1.6\%$ after correction) and sends more real email to the
@@ -230,19 +247,30 @@ Figure~\ref{fig:c5} and Table~\ref{tab:c5-loss} show the following.
   \item \emph{The remaining gap is the model, not the prior.} On synthetic data the corrected curves stay
         $0.04$--$0.06$ above the oracle near the training share (and $0.006$ above it at $\pion=0.05$, where
         almost every email is easy). The two classes have different covariances,
-        so the true log-odds are quadratic in $x$, while both of our models have linear log-odds. The prior
-        correction cannot remove this error, as assumption~(i) of Section~\ref{sec:t5} anticipates.
+        so the true log-odds are quadratic in $x$, while both of our models have linear log-odds. Label shift
+        holds exactly here by construction; what fails is the premise of ``Why this is the right correction'' in
+        Section~\ref{sec:t5}, that the trained posterior is exact (assumption~(ii)). The prior correction cannot
+        remove this error.
   \item \emph{An unknown prior can be estimated well if the model is calibrated.} On Spambase, logistic
-        regression's EM estimate is on average within about $0.01$ of the true share at every $\pion$, and the EM-corrected
-        loss is almost the same as with the known prior. On synthetic data both misspecified models give
-        probabilities that are too extreme in the tails, so EM underestimates small shares ($0.015$ instead of
-        $0.05$ for logistic regression). The loss rises only a little ($0.046$ against $0.040$). This is
-        assumption~(ii) of Section~\ref{sec:t5} at work: EM inherits any miscalibration of the model.
+        regression's EM estimate has a mean bias of at most $0.002$ and a mean absolute error of $0.007$--$0.013$
+        at every $\pion$, and the EM-corrected loss is almost the same as with the known prior. The Gaussian model's
+        estimate is too low: on synthetic data by $0.04$--$0.07$ at every share, even at the training share $0.5$
+        (estimate $0.446$), and on Spambase by $0.036$--$0.047$ for $\pion\ge0.4$, already $0.364$ at
+        $\pion=0.4$ where there is essentially no shift. A reliability check explains the direction. On
+        $200{,}000$ fresh synthetic emails at the training share (split $0$), emails both models give
+        $\post\approx0.06$ are $21$--$22\%$ spam, so they are over-confident at the low end, while emails given
+        $\post\approx0.85$ are $93$--$94\%$ spam, under-confident at the high end
+        (\texttt{results/c5\_calibration\_synthetic.csv}). Averaging such probabilities gives too small a share,
+        most of all when most emails sit at the low end: logistic regression estimates $0.015$ instead of $0.05$.
+        The loss rises only a little ($0.046$ against $0.040$). This is assumption~(ii) of Section~\ref{sec:t5}
+        at work: EM inherits any miscalibration of the model.
 \end{enumerate}
 
 \paragraph{Caveats.}
 The Spambase deployment sets are resampled from a test part of $919$ emails, so at extreme shares they are
-small and reuse the same emails, and their error bands are wider. Resampling within each class keeps
+small and reuse the same emails, and their error bands are wider. All 20 Spambase splits are drawn from
+the same $4{,}601$ emails, so they are not independent and their standard errors are somewhat optimistic.
+Resampling within each class keeps
 $p(x\mid y)$ fixed by construction. A real change of spam content would also change $p(x\mid y)$, and no
 prior correction can fix that.
 
